@@ -1,0 +1,19 @@
+{
+  "name": "rnpm-plugin-link",
+  "version": "0.0.1",
+  "description": "rnpm plugin for linking dependencies",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "rnpm",
+    "react-native"
+  ],
+  "author": "Amazing React Native Community (https://github.com/facebook/react-native)",
+  "contributors": [
+    "Alexey Kureev <kureev-mail@ya.ru> (https://github.com/Kureev)",
+    "Mike Grabowski <grabbou@gmail.com> (https://github.com/grabbou)"
+  ],
+  "license": "MIT"
+}
