@@ -1,6 +1,6 @@
 {
   "name": "rnpm-plugin-link",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "rnpm plugin for linking dependencies",
   "main": "index.js",
   "keywords": [
