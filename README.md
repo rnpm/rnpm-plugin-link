@@ -1,7 +1,7 @@
 rnpm link
 ==========
 
-This plugin is automatically installed with `rnpm`.
+This plugin is automatically installed with `rnpm`. 
 
 ## Usage
 
@@ -10,6 +10,10 @@ Automatically updates your project by linking all dependencies for Android (if p
 ```bash
 $ rnpm link react-native-module
 ```
+
+## Contributing
+
+Please submit issues and ideas directly to the main repository - [rnpm/rnpm](http://github.com/rnpm/rnpm)
 
 ## License
 
