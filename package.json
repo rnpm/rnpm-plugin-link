@@ -1,19 +1,38 @@
 {
   "name": "rnpm-plugin-link",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "rnpm plugin for linking dependencies",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "keywords": [
     "rnpm",
-    "react-native"
+    "react-native",
+    "react-native link"
   ],
+  "engines": {
+    "node": ">= 4.0.0"
+  },
+  "engineStrict": true,
   "author": "Amazing React Native Community (https://github.com/facebook/react-native)",
   "contributors": [
     "Alexey Kureev <kureev-mail@ya.ru> (https://github.com/Kureev)",
     "Mike Grabowski <grabbou@gmail.com> (https://github.com/grabbou)"
   ],
-  "license": "MIT"
+  "bugs": {
+    "url": "https://github.com/rnpm/rnpm/issues"
+  },
+  "homepage": "https://github.com/rnpm/rnpm#readme",
+  "license": "MIT",
+  "dependencies": {
+    "fs-extra": "^0.26.2",
+    "lodash.flowright": "^3.2.1",
+    "npmlog": "^2.0.0",
+    "xcode": "^0.8.2"
+  },
+  "peerDependencies": {
+    "rnpm": "^1.0.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^4.1.5",
+    "eslint": "^1.9.0"
+  }
 }
