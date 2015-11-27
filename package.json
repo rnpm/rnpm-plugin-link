@@ -15,7 +15,6 @@
   "engines": {
     "node": ">= 4.0.0"
   },
-  "engineStrict": true,
   "author": "Amazing React Native Community (https://github.com/facebook/react-native)",
   "contributors": [
     "Alexey Kureev <kureev-mail@ya.ru> (https://github.com/Kureev)",
