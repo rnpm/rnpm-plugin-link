@@ -14,7 +14,7 @@ module.exports = function copyAssetsIOS(files, projectConfig) {
   const assets = utils.groupByType(files);
   const plistPath = path.join(
     projectConfig.sourceDir,
-    project.getBuildProperty('INFOPLIST_FILE')
+    project.getBuildProperty('INFOPLIST_FILE').replace(/"/g, '')
   );
 
   if (!fs.existsSync(plistPath)) {
