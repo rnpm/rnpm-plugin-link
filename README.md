@@ -11,10 +11,6 @@ Automatically updates your project by linking all dependencies for Android (if p
 $ rnpm link react-native-module
 ```
 
-## Contributing
-
-Please submit issues and ideas directly to the main repository - [rnpm/rnpm](http://github.com/rnpm/rnpm)
-
 ## License
 
 The MIT License (MIT)
