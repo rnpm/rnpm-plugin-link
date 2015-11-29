@@ -50,12 +50,12 @@ module.exports = function link(config, args) {
         registerDependencyIOS(dependencyConfig.ios, project.ios);
       }
 
-      if (project.android && dependencyConfig.assets) {
+      if (project.android && dependencyConfig.assets.length > 0) {
         log.info(`Copying assets from ${name} to android project`);
         copyAssetsAndroid(dependencyConfig.assets, project.android.assetsPath);
       }
 
-      if (project.ios && dependencyConfig.assets) {
+      if (project.ios && dependencyConfig.assets.length > 0) {
         log.info(`Linking assets from ${name} to ios project`);
         copyAssetsIOS(dependencyConfig.assets, project.ios);
       }
