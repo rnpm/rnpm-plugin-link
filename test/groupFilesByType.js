@@ -1,6 +1,6 @@
 const chai = require('chai');
 const expect = chai.expect;
-const utils = require('../src/utils');
+const groupFilesByType = require('../src/groupFilesByType');
 
 describe('groupFilesByType', () => {
 
@@ -9,10 +9,10 @@ describe('groupFilesByType', () => {
       'fonts/a.ttf',
       'fonts/b.ttf',
       'images/a.jpg',
-      'images/c.jpeg'
+      'images/c.jpeg',
     ];
 
-    const groupedFiles = utils.groupByType(files);
+    const groupedFiles = groupFilesByType(files);
 
     expect(groupedFiles.font).to.contain('fonts/a.ttf');
     expect(groupedFiles.image).to.contain('images/a.jpg');
