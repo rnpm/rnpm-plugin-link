@@ -4,7 +4,7 @@
   "description": "rnpm plugin that links native dependencies to your project",
   "main": "index.js",
   "scripts": {
-    "test": "mocha ./test --recursive"
+    "test": "eslint ./ && mocha ./test --recursive"
   },
   "keywords": [
     "rnpm",
