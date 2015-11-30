@@ -1,7 +1,7 @@
-rnpm link
+rnpm link [![Circle CI](https://img.shields.io/circleci/project/rnpm/rnpm-plugin-link/master.svg)](https://circleci.com/gh/rnpm/rnpm-plugin-link) 
 ==========
 
-This plugin is automatically installed with `rnpm`. 
+This plugin is automatically installed with `rnpm`.
 
 ## Usage
 

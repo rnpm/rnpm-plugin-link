@@ -3,6 +3,11 @@ const fs = require('fs');
 const path = require('path');
 const PbxFile = require('xcode/lib/pbxFile');
 
+const addToHeaderSearchPaths = require('./addToHeaderSearchPaths');
+const getHeadersInFolder = require('./getHeadersInFolder');
+const getHeaderSearchPath = require('./getHeaderSearchPath');
+const isEmpty = require('../isEmpty');
+
 /**
  * Given an array of libraries already imported and packageName that will be
  * added, returns true or false depending on whether the library is already linked
@@ -77,6 +82,14 @@ module.exports = function registerNativeModuleIOS(dependencyConfig, projectConfi
       target: project.getFirstTarget().uuid,
     });
   });
+
+  const headers = getHeadersInFolder(dependencyConfig.folder);
+  if (!isEmpty(headers)) {
+    addToHeaderSearchPaths(
+      project,
+      getHeaderSearchPath(projectConfig.sourceDir, headers)
+    );
+  }
 
   fs.writeFileSync(
     projectConfig.pbxprojPath,

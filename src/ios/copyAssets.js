@@ -1,9 +1,9 @@
 const fs = require('fs-extra');
-const utils = require('../utils');
 const path = require('path');
 const xcode = require('xcode');
 const log = require('npmlog');
 const plistParser = require('plist');
+const groupFilesByType = require('../groupFilesByType');
 
 /**
  * This function works in a similar manner to its Android version,
@@ -11,7 +11,7 @@ const plistParser = require('plist');
  */
 module.exports = function copyAssetsIOS(files, projectConfig) {
   const project = xcode.project(projectConfig.pbxprojPath).parseSync();
-  const assets = utils.groupByType(files);
+  const assets = groupFilesByType(files);
   const plistPath = path.join(
     projectConfig.sourceDir,
     project.getBuildProperty('INFOPLIST_FILE').replace(/"/g, '')

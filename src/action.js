@@ -1,6 +1,7 @@
 const path = require('path');
 const log = require('npmlog');
 
+const isEmpty = require('./isEmpty');
 const registerDependencyAndroid = require('./android/registerNativeModule');
 const registerDependencyIOS = require('./ios/registerNativeModule');
 const copyAssetsAndroid = require('./android/copyAssets');
@@ -50,12 +51,12 @@ module.exports = function link(config, args) {
         registerDependencyIOS(dependencyConfig.ios, project.ios);
       }
 
-      if (project.android && dependencyConfig.assets) {
+      if (project.android && !isEmpty(dependencyConfig.assets)) {
         log.info(`Copying assets from ${name} to android project`);
         copyAssetsAndroid(dependencyConfig.assets, project.android.assetsPath);
       }
 
-      if (project.ios && dependencyConfig.assets) {
+      if (project.ios && !isEmpty(dependencyConfig.assets)) {
         log.info(`Linking assets from ${name} to ios project`);
         copyAssetsIOS(dependencyConfig.assets, project.ios);
       }
