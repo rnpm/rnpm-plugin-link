@@ -7,6 +7,9 @@ const SRC_DIR = path.join('react-native-project', 'ios');
 
 describe('ios#getHeaderSearchPath', () => {
 
+  /**
+   * See https://github.com/Microsoft/react-native-code-push
+   */
   it('should return correct path when all headers are in root folder', () => {
     const files = [
       path.join('react-native-project', 'node_modules', 'package', 'Gradient.h'),
@@ -20,6 +23,9 @@ describe('ios#getHeaderSearchPath', () => {
     );
   });
 
+  /**
+   * See https://github.com/facebook/react-native/tree/master/React
+   */
   it('should return correct path when headers are in multiple folders', () => {
     const files = [
       path.join('react-native-project', 'node_modules', 'package', 'src', 'folderA', 'Gradient.h'),
@@ -33,6 +39,9 @@ describe('ios#getHeaderSearchPath', () => {
     );
   });
 
+  /**
+   * This is just to make sure the above two does not collide with each other
+   */
   it('should return correct path when headers are in root and nested folders', () => {
     const files = [
       path.join('react-native-project', 'node_modules', 'package', 'src', 'folderA', 'Gradient.h'),
