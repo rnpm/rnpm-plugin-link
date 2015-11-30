@@ -7,22 +7,19 @@ const union = require('lodash.union');
 const lastItem = (array) => array[array.length - 1];
 
 /**
- * Given an array of headers it returns search path so Xcode can find them
- * If there are multiple header files located accross different folders,
- * it finds the top-most one and returns recursive version of it
+ * Given an array of directories, it returns the one that contains
+ * all the other directories in a given array inside it.
+ *
+ * Example:
+ * Given an array of directories: ['/Users/Kureev/a', '/Users/Kureev/b']
+ * the returned folder is `/Users/Kureev`
+ *
+ * Check `getHeaderSearchPath.spec.js` for more use-cases.
  */
-module.exports = function getHeaderSearchPath(sourceDir, headers) {
-  const directories = union(
-    headers.map(path.dirname)
-  );
-
-  if (directories.length === 1) {
-    return `"$(SRCROOT)/${path.relative(sourceDir, directories[0])}"`;
-  }
-
-  const directory = directories.reduce((topMostDir, currentDir) => {
+const getOuterDirectory = (directories) =>
+  directories.reduce((topDir, currentDir) => {
     const currentFolders = currentDir.split(path.sep);
-    const topMostFolders = topMostDir.split(path.sep);
+    const topMostFolders = topDir.split(path.sep);
 
     if (currentFolders.length === topMostFolders.length
       && lastItem(currentFolders) !== lastItem(topMostFolders)) {
@@ -31,8 +28,29 @@ module.exports = function getHeaderSearchPath(sourceDir, headers) {
 
     return currentFolders.length < topMostFolders.length
       ? currentDir
-      : topMostDir;
+      : topDir;
   });
 
-  return `"$(SRCROOT)/${path.relative(sourceDir, directory)}/**"`;
+/**
+ * Given an array of headers it returns search path so Xcode can resolve
+ * headers when referenced like below:
+ * ```
+ * #import "CodePush.h"
+ * ```
+ * If all files are located in one directory (directories.length === 1),
+ * we simply return a relative path to that location.
+ *
+ * Otherwise, we loop through them all to find the outer one that contains
+ * all the headers inside. That location is then returned with /** appended at
+ * the end so Xcode marks that location as `recursive` and will look inside
+ * every folder of it to locate correct headers.
+ */
+module.exports = function getHeaderSearchPath(sourceDir, headers) {
+  const directories = union(
+    headers.map(path.dirname)
+  );
+
+  return directories.length === 1
+    ? `"$(SRCROOT)/${path.relative(sourceDir, directories[0])}"`
+    : `"$(SRCROOT)/${path.relative(sourceDir, getOuterDirectory(directories))}/**"`;
 };
