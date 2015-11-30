@@ -1,6 +1,6 @@
 const fs = require('fs-extra');
-const utils = require('../utils');
 const path = require('path');
+const groupFilesByType = require('../groupFilesByType');
 
 /**
  * Copies each file from an array of assets provided to targetPath directory
@@ -9,7 +9,7 @@ const path = require('path');
  * - Fonts (otf, ttf) - copied to targetPath/fonts under original name
  */
 module.exports = function copyAssetsAndroid(files, targetPath) {
-  const assets = utils.groupByType(files);
+  const assets = groupFilesByType(files);
 
   (assets.font || []).forEach(asset => {
     const fileName = path.basename(asset);

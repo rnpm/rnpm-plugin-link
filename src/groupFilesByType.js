@@ -11,6 +11,6 @@ mime.define({
   'font/truetype': ['ttf'],
 });
 
-exports.groupByType = function groupByType(assets) {
+module.exports = function groupFilesByType(assets) {
   return groupBy(assets, type => mime.lookup(type).split('/')[0]);
 };
