@@ -1,10 +1,6 @@
 const path = require('path');
 const union = require('lodash.union');
-
-/**
- * Returns last item from an array
- */
-const lastItem = (array) => array[array.length - 1];
+const lastItem = require('../lastItem');
 
 /**
  * Given an array of directories, it returns the one that contains

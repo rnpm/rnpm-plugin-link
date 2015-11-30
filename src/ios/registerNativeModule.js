@@ -2,9 +2,11 @@ const xcode = require('xcode');
 const fs = require('fs');
 const path = require('path');
 const PbxFile = require('xcode/lib/pbxFile');
+
 const addToHeaderSearchPaths = require('./addToHeaderSearchPaths');
 const getHeadersInFolder = require('./getHeadersInFolder');
 const getHeaderSearchPath = require('./getHeaderSearchPath');
+const isEmpty = require('../isEmpty');
 
 /**
  * Given an array of libraries already imported and packageName that will be
@@ -82,7 +84,7 @@ module.exports = function registerNativeModuleIOS(dependencyConfig, projectConfi
   });
 
   const headers = getHeadersInFolder(dependencyConfig.folder);
-  if (headers.length > 0) {
+  if (!isEmpty(headers)) {
     addToHeaderSearchPaths(
       project,
       getHeaderSearchPath(projectConfig.sourceDir, headers)
