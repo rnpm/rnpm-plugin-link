@@ -48,11 +48,15 @@ module.exports = function registerNativeAndroidModule(name, dependencyConfig, pr
    * @param  {String}   instance   Code to instance a package, e.g. new VectorIconsPackage();
    * @return {Function}            Patcher function
    */
-  const makeMainActivityPatcher = (content) =>
-    replace(content,
-      MAIN_ACTIVITY_IMPORT_PATTERN,
-      dependencyConfig.packageImportPath) &&
-    replace(content, MAIN_ACTIVITY_PACKAGE_PATTERN, getMainActivityPatch());
+  const makeMainActivityPatcher = (content) => {
+    const patched = replace(
+      content, MAIN_ACTIVITY_IMPORT_PATTERN, dependencyConfig.packageImportPath
+    );
+
+    return replace(
+      patched, MAIN_ACTIVITY_PACKAGE_PATTERN, getMainActivityPatch()
+    );
+  };
 
   const applySettingsGradlePatch = compose(
     writeFile(projectConfig.settingsGradlePath),
