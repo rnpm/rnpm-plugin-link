@@ -6,59 +6,62 @@ const registerDependencyAndroid = require('./android/registerNativeModule');
 const registerDependencyIOS = require('./ios/registerNativeModule');
 const copyAssetsAndroid = require('./android/copyAssets');
 const copyAssetsIOS = require('./ios/copyAssets');
+const pjson = require(path.join(process.cwd(), './package.json'));
 
+/**
+ * Namespace log messages
+ */
 log.heading = 'rnpm-link';
 
 /**
  * Returns an array of dependencies that should be linked/checked.
+ * @param {Object} pconfig Project config
  */
-const getProjectDependencies = () => {
-  const pjson = require(path.join(process.cwd(), './package.json'));
-  return Object.keys(pjson.dependencies).filter(name => name !== 'react-native');
-};
+const getProjectDependencies = (pconfig) =>
+  Object.keys(pconfig.dependencies).filter(name => name !== 'react-native');
 
 /**
  * Updates project and linkes all dependencies to it
- *
- * If optional argument [packageName] is provided, it's the only one that's checked
+ * @param {Object} config Composed configuration object
+ * @param {Array}  args   Arguments from the command line
  */
 module.exports = function link(config, args) {
-  const project = config.getProjectConfig();
+  const pconfig = config.getProjectConfig();
 
-  if (!project) {
+  if (!pconfig) {
     log.error('ERRPACKAGEJSON', `No package found. Are you sure it's a React Native project?`);
     return;
   }
 
   const packageName = args[0];
-  const dependencies = packageName ? [packageName] : getProjectDependencies();
+  const dependencies = packageName ? [packageName] : getProjectDependencies(pjson);
 
   dependencies
     .forEach(name => {
-      const dependencyConfig = config.getDependencyConfig(name);
+      const dconfig = config.getDependencyConfig(name);
 
-      if (!dependencyConfig) {
+      if (!dconfig) {
         return log.warn('ERRINVALIDPROJ', `Project ${name} is not a react-native library`);
       }
 
-      if (project.android && dependencyConfig.android) {
+      if (pconfig.android && dconfig.android) {
         log.info(`Linking ${name} android dependency`);
-        registerDependencyAndroid(name, dependencyConfig.android, project.android);
+        registerDependencyAndroid(name, dconfig.android, pconfig.android);
       }
 
-      if (project.ios && dependencyConfig.ios) {
+      if (pconfig.ios && dconfig.ios) {
         log.info(`Linking ${name} ios dependency`);
-        registerDependencyIOS(dependencyConfig.ios, project.ios);
+        registerDependencyIOS(dconfig.ios, pconfig.ios);
       }
 
-      if (project.android && !isEmpty(dependencyConfig.assets)) {
+      if (pconfig.android && !isEmpty(dconfig.assets)) {
         log.info(`Copying assets from ${name} to android project`);
-        copyAssetsAndroid(dependencyConfig.assets, project.android.assetsPath);
+        copyAssetsAndroid(dconfig.assets, pconfig.android.assetsPath);
       }
 
-      if (project.ios && !isEmpty(dependencyConfig.assets)) {
+      if (pconfig.ios && !isEmpty(dconfig.assets)) {
         log.info(`Linking assets from ${name} to ios project`);
-        copyAssetsIOS(dependencyConfig.assets, project.ios);
+        copyAssetsIOS(dconfig.assets, pconfig.ios);
       }
     });
 };
