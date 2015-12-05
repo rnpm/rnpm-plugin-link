@@ -4,6 +4,7 @@ const xcode = require('xcode');
 const log = require('npmlog');
 const plistParser = require('plist');
 const groupFilesByType = require('../groupFilesByType');
+const addPBXGroup = require('./addPBXGroup');
 
 /**
  * This function works in a similar manner to its Android version,
@@ -25,12 +26,12 @@ module.exports = function copyAssetsIOS(files, projectConfig) {
   }
 
   if (!project.pbxGroupByName('Resources')) {
-    return log.error(
+    log.warn(
       'ERRGROUP',
-      `Group 'Resources' does not exist in your XCode project. See ` +
-      `https://developer.apple.com/library/ios/recipes/xcode_help-structure_navigator/articles/Creating_a_Group.html ` +
-      `for instructions on setting it up.`
+      `Group 'Resources' does not exist in your XCode project. We have created it automatically for you.`
     );
+
+    addPBXGroup(project, 'Resources');
   }
 
   const plist = plistParser.parse(
