@@ -13,7 +13,7 @@ const getMainGroup = (project) => {
   const projectId = Object.keys(projectSection)[0];
 
   return project.hash.project.objects.PBXGroup[
-   projectSection[projectId].mainGroup
+    projectSection[projectId].mainGroup
   ];
 };
 
