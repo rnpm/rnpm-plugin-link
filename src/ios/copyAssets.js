@@ -42,7 +42,7 @@ module.exports = function copyAssetsIOS(files, projectConfig) {
     .map(asset =>
       project.addResourceFile(
         path.relative(projectConfig.sourceDir, asset),
-        { target: project.getFirstTarget().uuid, }
+        { target: project.getFirstTarget().uuid }
       )
     )
     .filter(file => file)   // xcode returns false if file is already there
