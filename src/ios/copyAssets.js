@@ -8,7 +8,7 @@ const createGroup = require('./createGroup');
 
 /**
  * This function works in a similar manner to its Android version,
- * except it does not copies fonts but creates XCode Group references
+ * except it does not copy fonts but creates XCode Group references
  */
 module.exports = function copyAssetsIOS(files, projectConfig) {
   const project = xcode.project(projectConfig.pbxprojPath).parseSync();
@@ -42,9 +42,7 @@ module.exports = function copyAssetsIOS(files, projectConfig) {
     .map(asset =>
       project.addResourceFile(
         path.relative(projectConfig.sourceDir, asset),
-        {
-          target: project.getFirstTarget().uuid,
-        }
+        { target: project.getFirstTarget().uuid, }
       )
     )
     .filter(file => file)   // xcode returns false if file is already there

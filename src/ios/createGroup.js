@@ -1,5 +1,10 @@
 const getFirstProject = require('./getFirstProject');
 
+/**
+ * Given project and name of the group, creates a new top-level group,
+ * that is then - added to `mainGroup` so that it's visible as a top-level
+ * folder in your Xcode sidebar
+ */
 module.exports = function createGroup(project, name) {
   const uuid = project.pbxCreateGroup(name, '""');
 
