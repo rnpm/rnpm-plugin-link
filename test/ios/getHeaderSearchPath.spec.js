@@ -5,7 +5,7 @@ const path = require('path');
 
 const SRC_DIR = path.join('react-native-project', 'ios');
 
-describe('ios#getHeaderSearchPath', () => {
+describe('ios::getHeaderSearchPath', () => {
 
   /**
    * See https://github.com/Microsoft/react-native-code-push
