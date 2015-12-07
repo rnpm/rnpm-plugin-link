@@ -31,44 +31,49 @@ module.exports = function link(config, args) {
   }
 
   const packageName = args[0];
-  const dependencies = packageName ? [packageName] : getProjectDependencies();
 
-  const copyAssets = (assets) => {
-    if (project.ios) {
-      copyAssetsIOS(assets, project.ios);
-    }
-
-    if (project.android) {
-      copyAssetsAndroid(assets, project.android.assetsPath);
-    }
-  };
-
-  if (!isEmpty(project.assets)) {
-    log.info('Linking project assets');
-    copyAssets(project.assets);
-  }
+  const dependencies = (packageName ? [packageName] : getProjectDependencies())
+    .map(name => ({
+      config: config.getDependencyConfig(name),
+      name,
+    }))
+    .filter(dependency => {
+      if (!dependency.config) {
+        log.warn('ERRINVALIDPROJ', `Project ${dependency.name} is not a react-native library`);
+        return false;
+      }
+      return true;
+    });
 
   dependencies
-    .forEach(name => {
-      const dependency = config.getDependencyConfig(name);
-
-      if (!dependency) {
-        return log.warn('ERRINVALIDPROJ', `Project ${name} is not a react-native library`);
-      }
-
-      if (project.android && dependency.android) {
+    .forEach(dependency => {
+      if (project.android && dependency.config.android) {
         log.info(`Linking ${name} android dependency`);
         registerDependencyAndroid(name, dependency.android, project.android);
       }
 
-      if (project.ios && dependency.ios) {
+      if (project.ios && dependency.config.ios) {
         log.info(`Linking ${name} ios dependency`);
-        registerDependencyIOS(dependency.ios, project.ios);
-      }
-
-      if (!isEmpty(dependency.assets)) {
-        log.info(`Linking assets from ${name}`);
-        copyAssets(dependency.assets);
+        registerDependencyIOS(dependency.config.ios, project.ios);
       }
     });
+
+  const assets = dependencies.reduce(
+    (assets, dependency) => assets.concat(dependency.config.assets),
+    project.assets
+  );
+
+  if (isEmpty(assets)) {
+    return;
+  }
+
+  if (project.ios) {
+    log.info('Linking assets to ios project');
+    copyAssetsIOS(assets, project.ios);
+  }
+
+  if (project.android) {
+    log.info('Linking assets to android project');
+    copyAssetsAndroid(assets, project.android.assetsPath);
+  }
 };
