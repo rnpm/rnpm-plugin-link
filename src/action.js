@@ -1,5 +1,6 @@
 const path = require('path');
 const log = require('npmlog');
+const uniq = require('lodash.uniq');
 
 const isEmpty = require('./isEmpty');
 const registerDependencyAndroid = require('./android/registerNativeModule');
@@ -48,19 +49,22 @@ module.exports = function link(config, args) {
   dependencies
     .forEach(dependency => {
       if (project.android && dependency.config.android) {
-        log.info(`Linking ${name} android dependency`);
-        registerDependencyAndroid(name, dependency.android, project.android);
+        log.info(`Linking ${dependency.name} android dependency`);
+        registerDependencyAndroid(dependency.name, dependency.config.android, project.android);
       }
 
       if (project.ios && dependency.config.ios) {
-        log.info(`Linking ${name} ios dependency`);
+        log.info(`Linking ${dependency.name} ios dependency`);
         registerDependencyIOS(dependency.config.ios, project.ios);
       }
     });
 
-  const assets = dependencies.reduce(
-    (assets, dependency) => assets.concat(dependency.config.assets),
-    project.assets
+  const assets = uniq(
+    dependencies.reduce(
+      (assets, dependency) => assets.concat(dependency.config.assets),
+      project.assets
+    ),
+    asset => path.basename(asset)
   );
 
   if (isEmpty(assets)) {
