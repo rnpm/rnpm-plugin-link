@@ -35,20 +35,20 @@ module.exports = function link(config, args) {
 
   const dependencies =
     (packageName ? [packageName] : getProjectDependencies())
-    .map(name => ({
-      config: config.getDependencyConfig(name),
-      name,
-    }))
-    .filter(dependency => {
-      if (!dependency.config) {
+    .map(name => {
+      try {
+        return {
+          config: config.getDependencyConfig(name),
+          name,
+        };
+      } catch (err) {
         log.warn(
           'ERRINVALIDPROJ',
-          `Project ${dependency.name} is not a react-native library`
+          `Project ${name} is not a react-native library`
         );
-        return false;
       }
-      return true;
-    });
+    })
+    .filter(dependency => dependency);
 
   dependencies.forEach(dependency => {
     if (project.android && dependency.config.android) {
