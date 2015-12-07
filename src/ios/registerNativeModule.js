@@ -1,27 +1,14 @@
 const xcode = require('xcode');
 const fs = require('fs');
 const path = require('path');
-const PbxFile = require('xcode/lib/pbxFile');
 
 const addToHeaderSearchPaths = require('./addToHeaderSearchPaths');
 const getHeadersInFolder = require('./getHeadersInFolder');
 const getHeaderSearchPath = require('./getHeaderSearchPath');
 const getProducts = require('./getProducts');
 const hasLibraryImported = require('./hasLibraryImported');
+const addFileToProject = require('./addFileToProject');
 const isEmpty = require('../isEmpty');
-
-/**
- * Given xcodeproj and filePath, it creates new file
- * from path provided, adds it to the project
- * and returns newly created instance of a file
- */
-const addFileToProject = (project, filePath) => {
-  const file = new PbxFile(filePath);
-  file.uuid = project.generateUuid();
-  file.fileRef = project.generateUuid();
-  project.addToPbxFileReferenceSection(file);
-  return file;
-};
 
 /**
  * Given an array of xcodeproj libraries and pbxFile,

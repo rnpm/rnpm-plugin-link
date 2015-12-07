@@ -5,7 +5,7 @@ const hasLibraryImported = require('../../src/ios/hasLibraryImported');
 
 const project = xcode.project('test/fixtures/project.pbxproj');
 
-describe('ios::getProducts', () => {
+describe('ios::hasLibraryImported', () => {
 
   beforeEach(() => {
     project.parseSync();
