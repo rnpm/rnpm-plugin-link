@@ -5,15 +5,6 @@ const xcode = require('xcode');
 const createGroup = require('../../src/ios/createGroup');
 const lastItem = require('../../src/lastItem');
 
-const newGroup = {
-  uuid: 'newGroup_ID',
-  group: {},
-};
-
-const firstProject = {
-  mainGroup: 'mainGroup_ID',
-};
-
 describe('ios::createGroup', () => {
 
   const project = xcode.project('test/fixtures/project.pbxproj');
