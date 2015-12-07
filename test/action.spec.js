@@ -7,6 +7,8 @@ const path = require('path');
 
 const action = (config, args) => require('../src/action')(config, args || []);
 
+log.level = 'silent';
+
 describe('action', () => {
 
   beforeEach(() => {
