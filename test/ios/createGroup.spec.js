@@ -1,7 +1,9 @@
 const chai = require('chai');
 const sinon = require('sinon');
 const expect = chai.expect;
+const xcode = require('xcode');
 const createGroup = require('../../src/ios/createGroup');
+const lastItem = require('../../src/lastItem');
 
 const newGroup = {
   uuid: 'newGroup_ID',
@@ -14,36 +16,37 @@ const firstProject = {
 
 describe('ios::createGroup', () => {
 
+  const project = xcode.project('test/fixtures/project.pbxproj');
+
   beforeEach(() => {
-    project = {
-      pbxCreateGroup: sinon.stub().returns(newGroup.uuid),
-      getFirstProject: sinon.stub().returns({firstProject}),
-      getPBXGroupByKey: sinon.stub().returns({children: []}),
-      pbxGroupByName: sinon.stub().returns(newGroup),
-    };
+    project.parseSync();
   });
 
   it('should create a group with given name', () => {
+    const spy = sinon.spy(project, 'pbxCreateGroup');
+
     createGroup(project, 'Resources');
-    expect(
-      project.pbxCreateGroup.calledWith('Resources', '""')
-    ).to.be.true;
+
+    expect(spy.calledWith('Resources', '""')).to.be.true;
   });
 
   it('should attach group to main project group', () => {
-    createGroup(project, 'Resources');
+    const spy = sinon.spy(project, 'getPBXGroupByKey');
+    const mainGroupId = project.getFirstProject().firstProject.mainGroup;
+
+    const createdGroup = createGroup(project, 'Resources');
+
+    expect(spy.calledWith(mainGroupId)).to.be.true;
 
     expect(
-      project.getPBXGroupByKey.calledWith('mainGroup_ID')
-    ).to.be.true;
-
-    expect(
-      project.getPBXGroupByKey.returnValues[0].children.length
-    ).to.equals(1);
+      lastItem(project.getPBXGroupByKey(mainGroupId).children).value
+    ).to.equals(createdGroup.uuid);
   });
 
   it('should return newly created group', () => {
-    expect(createGroup(project, 'Resources')).to.equals(newGroup);
+    expect(
+      createGroup(project, 'Resources').group.name
+    ).to.equals('Resources');
   });
 
 });

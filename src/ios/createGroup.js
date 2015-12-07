@@ -20,5 +20,8 @@ module.exports = function createGroup(project, name) {
       comment: name,
     });
 
-  return project.pbxGroupByName(name);
+  return {
+    group: project.pbxGroupByName(name),
+    uuid,
+  };
 };
