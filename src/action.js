@@ -33,32 +33,42 @@ module.exports = function link(config, args) {
   const packageName = args[0];
   const dependencies = packageName ? [packageName] : getProjectDependencies();
 
+  const copyAssets = (assets) => {
+    if (project.ios) {
+      copyAssetsIOS(assets, project.ios);
+    }
+
+    if (project.android) {
+      copyAssetsAndroid(assets, project.android.assetsPath);
+    }
+  };
+
+  if (!isEmpty(project.assets)) {
+    log.info('Linking project assets');
+    copyAssets(project.assets);
+  }
+
   dependencies
     .forEach(name => {
-      const dependencyConfig = config.getDependencyConfig(name);
+      const dependency = config.getDependencyConfig(name);
 
-      if (!dependencyConfig) {
+      if (!dependency) {
         return log.warn('ERRINVALIDPROJ', `Project ${name} is not a react-native library`);
       }
 
-      if (project.android && dependencyConfig.android) {
+      if (project.android && dependency.android) {
         log.info(`Linking ${name} android dependency`);
-        registerDependencyAndroid(name, dependencyConfig.android, project.android);
+        registerDependencyAndroid(name, dependency.android, project.android);
       }
 
-      if (project.ios && dependencyConfig.ios) {
+      if (project.ios && dependency.ios) {
         log.info(`Linking ${name} ios dependency`);
-        registerDependencyIOS(dependencyConfig.ios, project.ios);
+        registerDependencyIOS(dependency.ios, project.ios);
       }
 
-      if (project.android && !isEmpty(dependencyConfig.assets)) {
-        log.info(`Copying assets from ${name} to android project`);
-        copyAssetsAndroid(dependencyConfig.assets, project.android.assetsPath);
-      }
-
-      if (project.ios && !isEmpty(dependencyConfig.assets)) {
-        log.info(`Linking assets from ${name} to ios project`);
-        copyAssetsIOS(dependencyConfig.assets, project.ios);
+      if (!isEmpty(dependency.assets)) {
+        log.info(`Linking assets from ${name}`);
+        copyAssets(dependency.assets);
       }
     });
 };
