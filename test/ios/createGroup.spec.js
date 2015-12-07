@@ -1,5 +1,4 @@
 const chai = require('chai');
-const sinon = require('sinon');
 const expect = chai.expect;
 const xcode = require('xcode');
 const createGroup = require('../../src/ios/createGroup');
@@ -14,11 +13,8 @@ describe('ios::createGroup', () => {
   });
 
   it('should create a group with given name', () => {
-    const spy = sinon.spy(project, 'pbxCreateGroup');
-
-    createGroup(project, 'Resources');
-
-    expect(spy.calledWith('Resources', '""')).to.be.true;
+    const createdGroup = createGroup(project, 'Resources').group;
+    expect(createdGroup.name).to.equals('Resources');
   });
 
   it('should attach group to main project group', () => {
@@ -29,12 +25,6 @@ describe('ios::createGroup', () => {
     expect(
       lastItem(mainGroup.children).value
     ).to.equals(createdGroup.uuid);
-  });
-
-  it('should return newly created group', () => {
-    expect(
-      createGroup(project, 'Resources').group.name
-    ).to.equals('Resources');
   });
 
 });
