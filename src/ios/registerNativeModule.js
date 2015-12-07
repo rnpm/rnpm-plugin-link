@@ -7,16 +7,8 @@ const addToHeaderSearchPaths = require('./addToHeaderSearchPaths');
 const getHeadersInFolder = require('./getHeadersInFolder');
 const getHeaderSearchPath = require('./getHeaderSearchPath');
 const getProducts = require('./getProducts');
+const hasLibraryImported = require('./hasLibraryImported');
 const isEmpty = require('../isEmpty');
-
-/**
- * Given an array of libraries already imported and packageName that will be
- * added, returns true or false depending on whether the library is already linked
- * or not
- */
-const hasLibraryImported = (libraries, packageName) => {
-  return libraries.children.filter(library => library.comment === packageName).length > 0;
-};
 
 /**
  * Given xcodeproj and filePath, it creates new file
