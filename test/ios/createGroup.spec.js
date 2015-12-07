@@ -4,9 +4,9 @@ const xcode = require('xcode');
 const createGroup = require('../../src/ios/createGroup');
 const lastItem = require('../../src/lastItem');
 
-describe('ios::createGroup', () => {
+const project = xcode.project('test/fixtures/project.pbxproj');
 
-  const project = xcode.project('test/fixtures/project.pbxproj');
+describe('ios::createGroup', () => {
 
   beforeEach(() => {
     project.parseSync();
