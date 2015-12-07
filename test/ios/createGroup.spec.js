@@ -22,15 +22,12 @@ describe('ios::createGroup', () => {
   });
 
   it('should attach group to main project group', () => {
-    const spy = sinon.spy(project, 'getPBXGroupByKey');
     const mainGroupId = project.getFirstProject().firstProject.mainGroup;
-
     const createdGroup = createGroup(project, 'Resources');
-
-    expect(spy.calledWith(mainGroupId)).to.be.true;
+    const mainGroup = project.getPBXGroupByKey(mainGroupId);
 
     expect(
-      lastItem(project.getPBXGroupByKey(mainGroupId).children).value
+      lastItem(mainGroup.children).value
     ).to.equals(createdGroup.uuid);
   });
 
