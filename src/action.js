@@ -33,14 +33,18 @@ module.exports = function link(config, args) {
 
   const packageName = args[0];
 
-  const dependencies = (packageName ? [packageName] : getProjectDependencies())
+  const dependencies =
+    (packageName ? [packageName] : getProjectDependencies())
     .map(name => ({
       config: config.getDependencyConfig(name),
       name,
     }))
     .filter(dependency => {
       if (!dependency.config) {
-        log.warn('ERRINVALIDPROJ', `Project ${dependency.name} is not a react-native library`);
+        log.warn(
+          'ERRINVALIDPROJ',
+          `Project ${dependency.name} is not a react-native library`
+        );
         return false;
       }
       return true;
@@ -50,7 +54,11 @@ module.exports = function link(config, args) {
     .forEach(dependency => {
       if (project.android && dependency.config.android) {
         log.info(`Linking ${dependency.name} android dependency`);
-        registerDependencyAndroid(dependency.name, dependency.config.android, project.android);
+        registerDependencyAndroid(
+          dependency.name,
+          dependency.config.android,
+          project.android
+        );
       }
 
       if (project.ios && dependency.config.ios) {
