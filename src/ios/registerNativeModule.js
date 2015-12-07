@@ -6,6 +6,7 @@ const PbxFile = require('xcode/lib/pbxFile');
 const addToHeaderSearchPaths = require('./addToHeaderSearchPaths');
 const getHeadersInFolder = require('./getHeadersInFolder');
 const getHeaderSearchPath = require('./getHeaderSearchPath');
+const getProducts = require('./getProducts');
 const isEmpty = require('../isEmpty');
 
 /**
@@ -15,19 +16,6 @@ const isEmpty = require('../isEmpty');
  */
 const hasLibraryImported = (libraries, packageName) => {
   return libraries.children.filter(library => library.comment === packageName).length > 0;
-};
-
-/**
- * Given xcodeproj it returns list of products ending with
- * .a extension, so that we know what elements add to target
- * project static library
- */
-const getProducts = (project) => {
-  return project
-    .pbxGroupByName('Products')
-    .children
-    .map(c => c.comment)
-    .filter(c => c.indexOf('.a') > -1);
 };
 
 /**
