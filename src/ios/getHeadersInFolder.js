@@ -1,7 +1,7 @@
 const glob = require('glob');
 const path = require('path');
 
-const GLOB_EXCLUDE_PATTERN = ['node_modules/**', 'Examples/**', 'examples/**'];
+const GLOB_EXCLUDE_PATTERN = ['node_modules/**', 'Pods/**', 'Examples/**', 'examples/**'];
 
 /**
  * Given folder, it returns an array of all header files
