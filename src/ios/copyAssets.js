@@ -26,12 +26,12 @@ module.exports = function copyAssetsIOS(files, projectConfig) {
   }
 
   if (!project.pbxGroupByName('Resources')) {
+    createGroup(project, 'Resources');
+
     log.warn(
       'ERRGROUP',
       `Group 'Resources' does not exist in your XCode project. We have created it automatically for you.`
     );
-
-    createGroup(project, 'Resources');
   }
 
   const plist = plistParser.parse(
