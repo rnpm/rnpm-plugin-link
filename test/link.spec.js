@@ -5,14 +5,14 @@ const mock = require('mock-require');
 const log = require('npmlog');
 const path = require('path');
 
-const action = (config, args) => require('../src/action')(config, args || []);
+const link = (config, args) => require('../src/link')(config, args || []);
 
 log.level = 'silent';
 
-describe('action', () => {
+describe('link', () => {
 
   beforeEach(() => {
-    delete require.cache[require.resolve('../src/action')];
+    delete require.cache[require.resolve('../src/link')];
   });
 
   // that test suite has to be changed in next PR so we have
@@ -24,7 +24,7 @@ describe('action', () => {
       getProjectConfig: () => null,
     };
 
-    action(config);
+    link(config);
 
     expect(spy.calledWith('ERRPACKAGEJSON')).to.be.true;
   });
@@ -35,7 +35,7 @@ describe('action', () => {
       getDependencyConfig: sinon.stub().returns({}),
     };
 
-    action(config, ['react-native-gradient']);
+    link(config, ['react-native-gradient']);
 
     expect(
       config.getDependencyConfig.calledWith('react-native-gradient')
@@ -57,7 +57,7 @@ describe('action', () => {
       }
     );
 
-    action(config);
+    link(config);
 
     expect(
       config.getDependencyConfig.calledWith('react-native-test')
@@ -81,7 +81,7 @@ describe('action', () => {
       registerNativeModule
     );
 
-    action(config, ['react-native-blur']);
+    link(config, ['react-native-blur']);
 
     expect(registerNativeModule.calledTwice).to.be.true;
   });
@@ -99,7 +99,7 @@ describe('action', () => {
       copyAssets
     );
 
-    action(config, ['react-native-blur']);
+    link(config, ['react-native-blur']);
 
     expect(copyAssets.calledOnce).to.be.true;
     expect(copyAssets.calledWith(assets)).to.be.true;
