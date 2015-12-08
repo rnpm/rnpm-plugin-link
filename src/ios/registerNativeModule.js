@@ -1,47 +1,14 @@
 const xcode = require('xcode');
 const fs = require('fs');
 const path = require('path');
-const PbxFile = require('xcode/lib/pbxFile');
 
 const addToHeaderSearchPaths = require('./addToHeaderSearchPaths');
 const getHeadersInFolder = require('./getHeadersInFolder');
 const getHeaderSearchPath = require('./getHeaderSearchPath');
+const getProducts = require('./getProducts');
+const hasLibraryImported = require('./hasLibraryImported');
+const addFileToProject = require('./addFileToProject');
 const isEmpty = require('../isEmpty');
-
-/**
- * Given an array of libraries already imported and packageName that will be
- * added, returns true or false depending on whether the library is already linked
- * or not
- */
-const hasLibraryImported = (libraries, packageName) => {
-  return libraries.children.filter(library => library.comment === packageName).length > 0;
-};
-
-/**
- * Given xcodeproj it returns list of products ending with
- * .a extension, so that we know what elements add to target
- * project static library
- */
-const getProducts = (project) => {
-  return project
-    .pbxGroupByName('Products')
-    .children
-    .map(c => c.comment)
-    .filter(c => c.indexOf('.a') > -1);
-};
-
-/**
- * Given xcodeproj and filePath, it creates new file
- * from path provided, adds it to the project
- * and returns newly created instance of a file
- */
-const addFileToProject = (project, filePath) => {
-  const file = new PbxFile(filePath);
-  file.uuid = project.generateUuid();
-  file.fileRef = project.generateUuid();
-  project.addToPbxFileReferenceSection(file);
-  return file;
-};
 
 /**
  * Given an array of xcodeproj libraries and pbxFile,
