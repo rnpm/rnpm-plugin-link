@@ -1,5 +1,6 @@
 const path = require('path');
 const log = require('npmlog');
+const uniq = require('lodash.uniq');
 
 const isEmpty = require('./isEmpty');
 const registerDependencyAndroid = require('./android/registerNativeModule');
@@ -32,34 +33,59 @@ module.exports = function link(config, args) {
   }
 
   const packageName = args[0];
-  const dependencies = packageName ? [packageName] : getProjectDependencies();
 
-  dependencies
-    .forEach(name => {
-      const dependencyConfig = config.getDependencyConfig(name);
-
-      if (!dependencyConfig) {
-        return log.warn('ERRINVALIDPROJ', `Project ${name} is not a react-native library`);
+  const dependencies =
+    (packageName ? [packageName] : getProjectDependencies())
+    .map(name => {
+      try {
+        return {
+          config: config.getDependencyConfig(name),
+          name,
+        };
+      } catch (err) {
+        log.warn(
+          'ERRINVALIDPROJ',
+          `Project ${name} is not a react-native library`
+        );
       }
+    })
+    .filter(dependency => dependency);
 
-      if (project.android && dependencyConfig.android) {
-        log.info(`Linking ${name} android dependency`);
-        registerDependencyAndroid(name, dependencyConfig.android, project.android);
-      }
+  dependencies.forEach(dependency => {
+    if (project.android && dependency.config.android) {
+      log.info(`Linking ${dependency.name} android dependency`);
+      registerDependencyAndroid(
+        dependency.name,
+        dependency.config.android,
+        project.android
+      );
+    }
 
-      if (project.ios && dependencyConfig.ios) {
-        log.info(`Linking ${name} ios dependency`);
-        registerDependencyIOS(dependencyConfig.ios, project.ios);
-      }
+    if (project.ios && dependency.config.ios) {
+      log.info(`Linking ${dependency.name} ios dependency`);
+      registerDependencyIOS(dependency.config.ios, project.ios);
+    }
+  });
 
-      if (project.android && !isEmpty(dependencyConfig.assets)) {
-        log.info(`Copying assets from ${name} to android project`);
-        copyAssetsAndroid(dependencyConfig.assets, project.android.assetsPath);
-      }
+  const assets = uniq(
+    dependencies.reduce(
+      (assets, dependency) => assets.concat(dependency.config.assets),
+      project.assets
+    ),
+    asset => path.basename(asset)
+  );
 
-      if (project.ios && !isEmpty(dependencyConfig.assets)) {
-        log.info(`Linking assets from ${name} to ios project`);
-        copyAssetsIOS(dependencyConfig.assets, project.ios);
-      }
-    });
+  if (isEmpty(assets)) {
+    return;
+  }
+
+  if (project.ios) {
+    log.info('Linking assets to ios project');
+    copyAssetsIOS(assets, project.ios);
+  }
+
+  if (project.android) {
+    log.info('Linking assets to android project');
+    copyAssetsAndroid(assets, project.android.assetsPath);
+  }
 };
