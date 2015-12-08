@@ -21,7 +21,9 @@ describe('link', () => {
     const spy = sinon.spy(log, 'error');
 
     const config = {
-      getProjectConfig: () => null,
+      getProjectConfig: () => {
+        throw new Error('No package.json found');
+      },
     };
 
     link(config);
@@ -31,8 +33,8 @@ describe('link', () => {
 
   it('should accept a name of a dependency to link', () => {
     const config = {
-      getProjectConfig: () => ({}),
-      getDependencyConfig: sinon.stub().returns({}),
+      getProjectConfig: () => ({ assets: [] }),
+      getDependencyConfig: sinon.stub().returns({ assets: [] }),
     };
 
     link(config, ['react-native-gradient']);
@@ -44,8 +46,8 @@ describe('link', () => {
 
   it('should read dependencies from package.json when name not provided', () => {
     const config = {
-      getProjectConfig: () => ({}),
-      getDependencyConfig: sinon.stub().returns({}),
+      getProjectConfig: () => ({ assets: [] }),
+      getDependencyConfig: sinon.stub().returns({ assets: [] }),
     };
 
     mock(
@@ -67,8 +69,8 @@ describe('link', () => {
   it('should register native module when android/ios projects are present', () => {
     const registerNativeModule = sinon.stub();
     const config = {
-      getProjectConfig: () => ({ android: {}, ios: {} }),
-      getDependencyConfig: sinon.stub().returns({ android: {}, ios: {} }),
+      getProjectConfig: () => ({ android: {}, ios: {}, assets: [] }),
+      getDependencyConfig: sinon.stub().returns({ android: {}, ios: {}, assets: [] }),
     };
 
     mock(
@@ -86,12 +88,14 @@ describe('link', () => {
     expect(registerNativeModule.calledTwice).to.be.true;
   });
 
-  it('should copy assets from dependency project', () => {
+  it('should copy assets from both project and dependencies projects', () => {
     const copyAssets = sinon.stub();
-    const assets = ['Fonts/Font.ttf'];
+    const dependencyAssets = ['Fonts/Font.ttf'];
+    const projectAssets = ['Fonts/FontC.ttf'];
+
     const config = {
-      getProjectConfig: () => ({ ios: {} }),
-      getDependencyConfig: sinon.stub().returns({ assets }),
+      getProjectConfig: () => ({ ios: {}, assets: projectAssets }),
+      getDependencyConfig: sinon.stub().returns({ assets: dependencyAssets }),
     };
 
     mock(
@@ -102,7 +106,30 @@ describe('link', () => {
     link(config, ['react-native-blur']);
 
     expect(copyAssets.calledOnce).to.be.true;
-    expect(copyAssets.calledWith(assets)).to.be.true;
+    expect(copyAssets.getCall(0).args[0]).to.deep.equals(
+      projectAssets.concat(dependencyAssets)
+    );
+  });
+
+  it('should remove duplicated assets before copying them', () => {
+    const copyAssets = sinon.stub();
+    const dependencyAssets = ['Fonts/FontB.ttf'];
+    const projectAssets = ['Fonts/FontB.ttf', 'Fonts/FontA.ttf'];
+
+    const config = {
+      getProjectConfig: () => ({ ios: {}, assets: projectAssets }),
+      getDependencyConfig: sinon.stub().returns({ assets: dependencyAssets }),
+    };
+
+    mock(
+      '../src/ios/copyAssets.js',
+      copyAssets
+    );
+
+    link(config, ['react-native-blur']);
+
+    expect(copyAssets.calledOnce).to.be.true;
+    expect(copyAssets.getCall(0).args[0]).to.deep.equals(projectAssets);
   });
 
   afterEach(() => {
