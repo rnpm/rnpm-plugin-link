@@ -1,5 +1,9 @@
-module.exports = {
+module.exports = [{
   func: require('./src/link'),
-  description: 'Updates your project and links all native dependencies',
+  description: 'Links all native dependencies',
   name: 'link [packageName]',
-};
+}, {
+  func: require('./src/unlink'),
+  description: 'Unlink native dependency',
+  name: 'unlink <packageName>',
+}];
