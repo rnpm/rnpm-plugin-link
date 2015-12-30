@@ -21,7 +21,7 @@ module.exports = function registerNativeAndroidModule(name, dependencyConfig, pr
   const BUILD_PATCH = `    compile project(':${name}')`;
   const SETTINGS_PATCH = `include ':${name}'\n` +
     `project(':${name}').projectDir = ` +
-    `new File(rootProject.projectDir, '../node_modules/${name}/android')`;
+    `new File(rootProject.projectDir, '../node_modules/${name}/${dependencyConfig.sourceDir}')`;
 
   /**
    * Replace SETTINGS_PATCH_PATTERN by patch in the passed content
