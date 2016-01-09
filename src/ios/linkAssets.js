@@ -5,6 +5,7 @@ const log = require('npmlog');
 const plistParser = require('plist');
 const groupFilesByType = require('../groupFilesByType');
 const createGroup = require('./createGroup');
+const getPlistPath = require('./getPlistPath');
 
 /**
  * This function works in a similar manner to its Android version,

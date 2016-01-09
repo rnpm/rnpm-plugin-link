@@ -99,7 +99,7 @@ describe('link', () => {
     };
 
     mock(
-      '../src/ios/copyAssets.js',
+      '../src/ios/linkAssets.js',
       copyAssets
     );
 
@@ -122,7 +122,7 @@ describe('link', () => {
     };
 
     mock(
-      '../src/ios/copyAssets.js',
+      '../src/ios/linkAssets.js',
       copyAssets
     );
 
