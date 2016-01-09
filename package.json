@@ -31,6 +31,7 @@
   "dependencies": {
     "fs-extra": "^0.26.2",
     "glob": "^6.0.1",
+    "lodash.difference": "^3.2.2",
     "lodash.flowright": "^3.2.1",
     "lodash.groupby": "^3.1.1",
     "lodash.union": "^3.1.0",

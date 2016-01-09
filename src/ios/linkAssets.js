@@ -13,10 +13,7 @@ const createGroup = require('./createGroup');
 module.exports = function linkAssetsIOS(files, projectConfig) {
   const project = xcode.project(projectConfig.pbxprojPath).parseSync();
   const assets = groupFilesByType(files);
-  const plistPath = path.join(
-    projectConfig.sourceDir,
-    project.getBuildProperty('INFOPLIST_FILE').replace(/"/g, '').replace('$(SRCROOT)', '')
-  );
+  const plistPath = path.join(projectConfig.sourceDir, getPlistPath(project));
 
   if (!fs.existsSync(plistPath)) {
     return log.error(
