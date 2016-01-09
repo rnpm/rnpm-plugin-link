@@ -5,8 +5,8 @@ const uniq = require('lodash.uniq');
 const isEmpty = require('./isEmpty');
 const registerDependencyAndroid = require('./android/registerNativeModule');
 const registerDependencyIOS = require('./ios/registerNativeModule');
-const copyAssetsAndroid = require('./android/copyAssets');
-const copyAssetsIOS = require('./ios/copyAssets');
+const linkAssetsAndroid = require('./android/copyAssets');
+const linkAssetsIOS = require('./ios/linkAssets');
 
 log.heading = 'rnpm-link';
 
@@ -81,11 +81,11 @@ module.exports = function link(config, args) {
 
   if (project.ios) {
     log.info('Linking assets to ios project');
-    copyAssetsIOS(assets, project.ios);
+    linkAssetsIOS(assets, project.ios);
   }
 
   if (project.android) {
     log.info('Linking assets to android project');
-    copyAssetsAndroid(assets, project.android.assetsPath);
+    linkAssetsAndroid(assets, project.android.assetsPath);
   }
 };

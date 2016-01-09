@@ -4,9 +4,9 @@ const uniq = require('lodash.uniq');
 
 const isEmpty = require('./isEmpty');
 const unregisterDependencyAndroid = require('./android/unregisterNativeModule');
-const registerDependencyIOS = require('./ios/registerNativeModule');
+const unregisterDependencyIOS = require('./ios/unregisterNativeModule');
 const unlinkAssetsAndroid = require('./android/unlinkAssets');
-const copyAssetsIOS = require('./ios/copyAssets');
+const unlinkAssetsIOS = require('./ios/unlikAssets');
 
 log.heading = 'rnpm-link';
 
@@ -40,14 +40,17 @@ module.exports = function unlink(config, args) {
     log.info(`Unlinking ${packageName} android dependency`);
 
     if (unregisterDependencyAndroid(packageName, dependency.android, project.android)) {
-      log.info(`Module ${packageName} has been successfully unlinked`);
+      log.info(`Android module ${packageName} has been successfully unlinked`);
     }
   }
 
-  // if (project.ios && config.ios) {
-  //   log.info(`Unlinking ${packageName} ios dependency`);
-  //   registerDependencyIOS(config.ios, project.ios);
-  // }
+  if (project.ios && config.ios) {
+    log.info(`Unlinking ${packageName} ios dependency`);
+
+    if (unregisterDependencyIOS(config.ios, project.ios)) {
+      log.info(`iOS module ${packageName} has been successfully unlinked`);
+    }
+  }
 
   const assets = dependency.assets;
 
@@ -55,10 +58,10 @@ module.exports = function unlink(config, args) {
     return;
   }
 
-  // if (project.ios) {
-  //   log.info('Linking assets to ios project');
-  //   copyAssetsIOS(assets, project.ios);
-  // }
+  if (project.ios) {
+    log.info('Unlinking assets to ios project');
+    unlinkAssetsIOS(assets, project.ios);
+  }
 
   if (project.android) {
     log.info('Unlinking assets from android project');

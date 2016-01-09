@@ -10,7 +10,7 @@ const createGroup = require('./createGroup');
  * This function works in a similar manner to its Android version,
  * except it does not copy fonts but creates XCode Group references
  */
-module.exports = function copyAssetsIOS(files, projectConfig) {
+module.exports = function linkAssetsIOS(files, projectConfig) {
   const project = xcode.project(projectConfig.pbxprojPath).parseSync();
   const assets = groupFilesByType(files);
   const plistPath = path.join(
