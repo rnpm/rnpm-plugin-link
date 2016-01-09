@@ -5,7 +5,7 @@ const getPlistPath = require('../../src/ios/getPlistPath');
 
 const project = xcode.project('test/fixtures/project.pbxproj');
 
-describe('ios::createGroup', () => {
+describe('ios::getPlistPath', () => {
 
   beforeEach(() => {
     project.parseSync();
