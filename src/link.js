@@ -1,6 +1,8 @@
+const exec = require('child_process').exec;
 const path = require('path');
 const log = require('npmlog');
 const uniq = require('lodash.uniq');
+const async = require('async');
 
 const isEmpty = require('./isEmpty');
 const registerDependencyAndroid = require('./android/registerNativeModule');
@@ -51,22 +53,6 @@ module.exports = function link(config, args) {
     })
     .filter(dependency => dependency);
 
-  dependencies.forEach(dependency => {
-    if (project.android && dependency.config.android) {
-      log.info(`Linking ${dependency.name} android dependency`);
-      registerDependencyAndroid(
-        dependency.name,
-        dependency.config.android,
-        project.android
-      );
-    }
-
-    if (project.ios && dependency.config.ios) {
-      log.info(`Linking ${dependency.name} ios dependency`);
-      registerDependencyIOS(dependency.config.ios, project.ios);
-    }
-  });
-
   const assets = uniq(
     dependencies.reduce(
       (assets, dependency) => assets.concat(dependency.config.assets),
@@ -79,13 +65,65 @@ module.exports = function link(config, args) {
     return;
   }
 
-  if (project.ios) {
-    log.info('Linking assets to ios project');
-    copyAssetsIOS(assets, project.ios);
-  }
+  const tasks = dependencies.map((dependency) => (callback) => {
+    const before = (cb) => {
+      if (dependency.config.hooks && dependency.config.hooks.before) {
+        exec(dependency.config.hooks.before, function before(err, stdout, stderr) {
+          if (!err && !stderr) {
+            console.log(stdout);
+            cb();
+          } else {
+            throw Error(err || stderr);
+          }
+        });
+      } else {
+        cb();
+      }
+    };
 
-  if (project.android) {
-    log.info('Linking assets to android project');
-    copyAssetsAndroid(assets, project.android.assetsPath);
-  }
+    const after = (cb) => {
+      if (dependency.config.hooks && dependency.config.hooks.after) {
+        exec(dependency.config.hooks.after, function after(err, stdout, stderr) {
+          if (!err && !stderr) {
+            console.log(stdout);
+            cb();
+          } else {
+            throw Error(err || stderr);
+          }
+        });
+      } else {
+        cb();
+      }
+    };
+
+    async.waterfall([before, (cb) => {
+      if (project.android && dependency.config.android) {
+        log.info(`Linking ${dependency.name} android dependency`);
+        registerDependencyAndroid(
+          dependency.name,
+          dependency.config.android,
+          project.android
+        );
+      }
+
+      if (project.ios && dependency.config.ios) {
+        log.info(`Linking ${dependency.name} ios dependency`);
+        registerDependencyIOS(dependency.config.ios, project.ios);
+      }
+
+      if (project.ios) {
+        log.info('Linking assets to ios project');
+        copyAssetsIOS(assets, project.ios);
+      }
+
+      if (project.android) {
+        log.info('Linking assets to android project');
+        copyAssetsAndroid(assets, project.android.assetsPath);
+      }
+
+      cb();
+    }, after, callback]);
+  });
+
+  async.series(tasks);
 };
