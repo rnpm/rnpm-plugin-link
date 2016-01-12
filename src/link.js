@@ -62,14 +62,14 @@ module.exports = function link(config, args, callback) {
   );
 
   const tasks = dependencies.map((dependency) => (next) => {
-    const before = (cb) => {
-      if (dependency.config.hooks && dependency.config.hooks.before) {
-        const hook = spawn(dependency.config.hooks.before, {
+    const prelink = (cb) => {
+      if (dependency.config.hooks && dependency.config.hooks.prelink) {
+        const hook = spawn(dependency.config.hooks.prelink, {
           stdio: 'inherit',
           stdin: 'inherit',
         });
 
-        hook.on('close', function before(code) {
+        hook.on('close', function prelink(code) {
           if (code) {
             process.exit(code);
           }
@@ -81,14 +81,14 @@ module.exports = function link(config, args, callback) {
       }
     };
 
-    const after = (cb) => {
-      if (dependency.config.hooks && dependency.config.hooks.after) {
-        const hook = spawn(dependency.config.hooks.after, {
+    const postlink = (cb) => {
+      if (dependency.config.hooks && dependency.config.hooks.postlink) {
+        const hook = spawn(dependency.config.hooks.postlink, {
           stdio: 'inherit',
           stdin: 'inherit',
         });
 
-        hook.on('close', function after(code) {
+        hook.on('close', function postlink(code) {
           if (code) {
             process.exit(code);
           }
@@ -100,7 +100,7 @@ module.exports = function link(config, args, callback) {
       }
     };
 
-    async.waterfall([before, (cb) => {
+    async.waterfall([prelink, (cb) => {
       if (project.android && dependency.config.android) {
         log.info(`Linking ${dependency.name} android dependency`);
         registerDependencyAndroid(
@@ -130,7 +130,7 @@ module.exports = function link(config, args, callback) {
       }
 
       cb();
-    }, after, next]);
+    }, postlink, next]);
   });
 
   async.series(tasks, callback || () => {});
