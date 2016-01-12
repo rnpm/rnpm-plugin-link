@@ -25,7 +25,7 @@ const getProjectDependencies = () => {
  *
  * If optional argument [packageName] is provided, it's the only one that's checked
  */
-module.exports = function link(config, args) {
+module.exports = function link(config, args, callback) {
 
   try {
     const project = config.getProjectConfig();
@@ -61,11 +61,7 @@ module.exports = function link(config, args) {
     asset => path.basename(asset)
   );
 
-  if (isEmpty(assets)) {
-    return;
-  }
-
-  const tasks = dependencies.map((dependency) => (callback) => {
+  const tasks = dependencies.map((dependency) => (next) => {
     const before = (cb) => {
       if (dependency.config.hooks && dependency.config.hooks.before) {
         exec(dependency.config.hooks.before, function before(err, stdout, stderr) {
@@ -111,6 +107,10 @@ module.exports = function link(config, args) {
         registerDependencyIOS(dependency.config.ios, project.ios);
       }
 
+      if (isEmpty(assets)) {
+        return cb();
+      }
+
       if (project.ios) {
         log.info('Linking assets to ios project');
         copyAssetsIOS(assets, project.ios);
@@ -122,8 +122,8 @@ module.exports = function link(config, args) {
       }
 
       cb();
-    }, after, callback]);
+    }, after, next]);
   });
 
-  async.series(tasks);
+  async.series(tasks, callback || () => {});
 };
