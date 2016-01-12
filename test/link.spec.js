@@ -5,7 +5,7 @@ const mock = require('mock-require');
 const log = require('npmlog');
 const path = require('path');
 
-const link = (config, args) => require('../src/link')(config, args || []);
+const link = require('../src/link');
 
 log.level = 'silent';
 
@@ -31,20 +31,21 @@ describe('link', () => {
     expect(spy.calledWith('ERRPACKAGEJSON')).to.be.true;
   });
 
-  it('should accept a name of a dependency to link', () => {
+  it('should accept a name of a dependency to link', (done) => {
     const config = {
       getProjectConfig: () => ({ assets: [] }),
       getDependencyConfig: sinon.stub().returns({ assets: [] }),
     };
 
-    link(config, ['react-native-gradient']);
-
-    expect(
-      config.getDependencyConfig.calledWith('react-native-gradient')
-    ).to.be.true;
+    link(config, ['react-native-gradient'], () => {
+      expect(
+        config.getDependencyConfig.calledWith('react-native-gradient')
+      ).to.be.true;
+      done();
+    });
   });
 
-  it('should read dependencies from package.json when name not provided', () => {
+  it('should read dependencies from package.json when name not provided', (done) => {
     const config = {
       getProjectConfig: () => ({ assets: [] }),
       getDependencyConfig: sinon.stub().returns({ assets: [] }),
@@ -59,11 +60,12 @@ describe('link', () => {
       }
     );
 
-    link(config);
-
-    expect(
-      config.getDependencyConfig.calledWith('react-native-test')
-    ).to.be.true;
+    link(config, [], () => {
+      expect(
+        config.getDependencyConfig.calledWith('react-native-test')
+      ).to.be.true;
+      done();
+    });
   });
 
   it('should register native module when android/ios projects are present', () => {
@@ -83,53 +85,59 @@ describe('link', () => {
       registerNativeModule
     );
 
-    link(config, ['react-native-blur']);
-
-    expect(registerNativeModule.calledTwice).to.be.true;
+    link(config, ['react-native-blur'], () => {
+      expect(registerNativeModule.calledTwice).to.be.true;
+    });
   });
 
-  it('should copy assets from both project and dependencies projects', () => {
-    const copyAssets = sinon.stub();
+  it('should copy assets from both project and dependencies projects', (done) => {
     const dependencyAssets = ['Fonts/Font.ttf'];
     const projectAssets = ['Fonts/FontC.ttf'];
-
-    const config = {
-      getProjectConfig: () => ({ ios: {}, assets: projectAssets }),
-      getDependencyConfig: sinon.stub().returns({ assets: dependencyAssets }),
-    };
+    const copyAssets = sinon.stub();
 
     mock(
       '../src/ios/copyAssets.js',
       copyAssets
     );
 
-    link(config, ['react-native-blur']);
+    const config = {
+      getProjectConfig: () => ({ ios: {}, assets: projectAssets }),
+      getDependencyConfig: sinon.stub().returns({ assets: dependencyAssets }),
+    };
 
-    expect(copyAssets.calledOnce).to.be.true;
-    expect(copyAssets.getCall(0).args[0]).to.deep.equals(
-      projectAssets.concat(dependencyAssets)
-    );
+    const link = require('../src/link');
+
+    link(config, ['react-native-blur'], () => {
+      expect(copyAssets.calledOnce).to.be.true;
+      expect(copyAssets.getCall(0).args[0]).to.deep.equals(
+        projectAssets.concat(dependencyAssets)
+      );
+      done();
+    });
   });
 
-  it('should remove duplicated assets before copying them', () => {
+  it('should remove duplicated assets before copying them', (done) => {
     const copyAssets = sinon.stub();
     const dependencyAssets = ['Fonts/FontB.ttf'];
     const projectAssets = ['Fonts/FontB.ttf', 'Fonts/FontA.ttf'];
 
-    const config = {
-      getProjectConfig: () => ({ ios: {}, assets: projectAssets }),
-      getDependencyConfig: sinon.stub().returns({ assets: dependencyAssets }),
-    };
-
     mock(
       '../src/ios/copyAssets.js',
       copyAssets
     );
 
-    link(config, ['react-native-blur']);
+    const config = {
+      getProjectConfig: () => ({ ios: {}, assets: projectAssets }),
+      getDependencyConfig: sinon.stub().returns({ assets: dependencyAssets }),
+    };
 
-    expect(copyAssets.calledOnce).to.be.true;
-    expect(copyAssets.getCall(0).args[0]).to.deep.equals(projectAssets);
+    const link = require('../src/link');
+
+    link(config, ['react-native-blur'], () => {
+      expect(copyAssets.calledOnce).to.be.true;
+      expect(copyAssets.getCall(0).args[0]).to.deep.equals(projectAssets);
+      done();
+    });
   });
 
   afterEach(() => {
