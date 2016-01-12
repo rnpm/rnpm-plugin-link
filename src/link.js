@@ -1,4 +1,4 @@
-const exec = require('child_process').exec;
+const spawn = require('child_process').spawn;
 const path = require('path');
 const log = require('npmlog');
 const uniq = require('lodash.uniq');
@@ -64,13 +64,17 @@ module.exports = function link(config, args, callback) {
   const tasks = dependencies.map((dependency) => (next) => {
     const before = (cb) => {
       if (dependency.config.hooks && dependency.config.hooks.before) {
-        exec(dependency.config.hooks.before, function before(err, stdout, stderr) {
-          if (!err && !stderr) {
-            console.log(stdout);
-            cb();
-          } else {
-            throw Error(err || stderr);
+        const hook = spawn(dependency.config.hooks.before, {
+          stdio: 'inherit',
+          stdin: 'inherit',
+        });
+
+        hook.on('close', function before(code) {
+          if (code) {
+            process.exit(code);
           }
+
+          cb();
         });
       } else {
         cb();
@@ -79,13 +83,17 @@ module.exports = function link(config, args, callback) {
 
     const after = (cb) => {
       if (dependency.config.hooks && dependency.config.hooks.after) {
-        exec(dependency.config.hooks.after, function after(err, stdout, stderr) {
-          if (!err && !stderr) {
-            console.log(stdout);
-            cb();
-          } else {
-            throw Error(err || stderr);
+        const hook = spawn(dependency.config.hooks.after, {
+          stdio: 'inherit',
+          stdin: 'inherit',
+        });
+
+        hook.on('close', function after(code) {
+          if (code) {
+            process.exit(code);
           }
+
+          cb();
         });
       } else {
         cb();
