@@ -12,6 +12,27 @@ const copyAssetsIOS = require('./ios/copyAssets');
 
 log.heading = 'rnpm-link';
 
+function makeHook(dependency, name) {
+  return (cb) => {
+    if (dependency.config.hooks && dependency.config.hooks[name]) {
+      const hook = spawn(dependency.config.hooks[name], {
+        stdio: 'inherit',
+        stdin: 'inherit',
+      });
+
+      hook.on('close', function prelink(code) {
+        if (code) {
+          process.exit(code);
+        }
+
+        cb();
+      });
+    } else {
+      cb();
+    }
+  };
+}
+
 /**
  * Returns an array of dependencies that should be linked/checked.
  */
@@ -62,43 +83,8 @@ module.exports = function link(config, args, callback) {
   );
 
   const tasks = dependencies.map((dependency) => (next) => {
-    const prelink = (cb) => {
-      if (dependency.config.hooks && dependency.config.hooks.prelink) {
-        const hook = spawn(dependency.config.hooks.prelink, {
-          stdio: 'inherit',
-          stdin: 'inherit',
-        });
-
-        hook.on('close', function prelink(code) {
-          if (code) {
-            process.exit(code);
-          }
-
-          cb();
-        });
-      } else {
-        cb();
-      }
-    };
-
-    const postlink = (cb) => {
-      if (dependency.config.hooks && dependency.config.hooks.postlink) {
-        const hook = spawn(dependency.config.hooks.postlink, {
-          stdio: 'inherit',
-          stdin: 'inherit',
-        });
-
-        hook.on('close', function postlink(code) {
-          if (code) {
-            process.exit(code);
-          }
-
-          cb();
-        });
-      } else {
-        cb();
-      }
-    };
+    const prelink = makeHook(dependency, 'prelink');
+    const postlink = makeHook(dependency, 'postlink');
 
     async.waterfall([prelink, (cb) => {
       if (project.android && dependency.config.android) {
