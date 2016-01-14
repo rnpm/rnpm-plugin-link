@@ -13,18 +13,22 @@ const copyAssetsIOS = require('./ios/copyAssets');
 log.heading = 'rnpm-link';
 
 const makeHook = (dependency, name) => (cb) => {
-  if (dependency.config.hooks && dependency.config.hooks[name]) {
-    const hook = spawn(dependency.config.hooks[name], {
-      stdio: 'inherit',
-      stdin: 'inherit',
-    });
-
-    hook.on('close', function prelink(code) {
-      cb(code);
-    });
-  } else {
-    cb();
+  if (!dependency.config.hooks || !dependency.config.hooks[name]) {
+    return cb();
   }
+
+  const hook = spawn(dependency.config.hooks[name], {
+    stdio: 'inherit',
+    stdin: 'inherit',
+  });
+
+  hook.on('close', function prelink(code) {
+    if (code) {
+      console.error('\033[31m', `> Failed to link a "${dependency.name}" module`, '\033[91m');
+    }
+
+    cb();
+  });
 };
 
 /**
@@ -76,41 +80,44 @@ module.exports = function link(config, args, callback) {
     asset => path.basename(asset)
   );
 
+  const makeLink = (dependency) => (cb) => {
+    if (project.android && dependency.config.android) {
+      log.info(`Linking ${dependency.name} android dependency`);
+      registerDependencyAndroid(
+        dependency.name,
+        dependency.config.android,
+        project.android
+      );
+    }
+
+    if (project.ios && dependency.config.ios) {
+      log.info(`Linking ${dependency.name} ios dependency`);
+      registerDependencyIOS(dependency.config.ios, project.ios);
+    }
+
+    if (isEmpty(assets)) {
+      return cb();
+    }
+
+    if (project.ios) {
+      log.info('Linking assets to ios project');
+      copyAssetsIOS(assets, project.ios);
+    }
+
+    if (project.android) {
+      log.info('Linking assets to android project');
+      copyAssetsAndroid(assets, project.android.assetsPath);
+    }
+
+    cb();
+  };
+
   const tasks = dependencies.map((dependency) => (next) => {
     const prelink = makeHook(dependency, 'prelink');
     const postlink = makeHook(dependency, 'postlink');
+    const link = makeLink(dependency);
 
-    async.waterfall([prelink, (cb) => {
-      if (project.android && dependency.config.android) {
-        log.info(`Linking ${dependency.name} android dependency`);
-        registerDependencyAndroid(
-          dependency.name,
-          dependency.config.android,
-          project.android
-        );
-      }
-
-      if (project.ios && dependency.config.ios) {
-        log.info(`Linking ${dependency.name} ios dependency`);
-        registerDependencyIOS(dependency.config.ios, project.ios);
-      }
-
-      if (isEmpty(assets)) {
-        return cb();
-      }
-
-      if (project.ios) {
-        log.info('Linking assets to ios project');
-        copyAssetsIOS(assets, project.ios);
-      }
-
-      if (project.android) {
-        log.info('Linking assets to android project');
-        copyAssetsAndroid(assets, project.android.assetsPath);
-      }
-
-      cb();
-    }, postlink, next]);
+    async.waterfall([prelink, link, postlink, next]);
   });
 
   async.series(tasks, callback || () => {});
