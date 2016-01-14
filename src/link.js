@@ -12,26 +12,20 @@ const copyAssetsIOS = require('./ios/copyAssets');
 
 log.heading = 'rnpm-link';
 
-function makeHook(dependency, name) {
-  return (cb) => {
-    if (dependency.config.hooks && dependency.config.hooks[name]) {
-      const hook = spawn(dependency.config.hooks[name], {
-        stdio: 'inherit',
-        stdin: 'inherit',
-      });
+const makeHook = (dependency, name) => (cb) => {
+  if (dependency.config.hooks && dependency.config.hooks[name]) {
+    const hook = spawn(dependency.config.hooks[name], {
+      stdio: 'inherit',
+      stdin: 'inherit',
+    });
 
-      hook.on('close', function prelink(code) {
-        if (code) {
-          process.exit(code);
-        }
-
-        cb();
-      });
-    } else {
-      cb();
-    }
-  };
-}
+    hook.on('close', function prelink(code) {
+      cb(code);
+    });
+  } else {
+    cb();
+  }
+};
 
 /**
  * Returns an array of dependencies that should be linked/checked.
