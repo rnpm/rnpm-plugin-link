@@ -24,7 +24,7 @@ const makeHook = (dependency, name) => (cb) => {
 
   hook.on('close', function prelink(code) {
     if (code) {
-      console.error('\033[31m', `> Failed to link a "${dependency.name}" module`, '\033[91m');
+      log.error(`Failed to link a "${dependency.name}" module`);
     }
 
     cb();
