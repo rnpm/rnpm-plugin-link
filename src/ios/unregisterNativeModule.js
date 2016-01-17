@@ -1,6 +1,10 @@
 const xcode = require('xcode');
 
 const hasLibraryImported = require('./hasLibraryImported');
+const removeFileFromProject = require('./removeFileFromProject');
+const removeProjectFromLibraries = require('./removeProjectFromLibraries');
+const removeFromStaticLibraries = require('./removeFromStaticLibraries');
+const removeFromHeaderSearchPaths = require('./removeFromHeaderSearchPaths');
 
 /**
  * Unregister native module IOS
@@ -16,7 +20,28 @@ module.exports = function unregisterNativeModule() {
     return false;
   }
 
-  // @todo add actual logic here later
+  const file = removeFileFromProject(
+    project,
+    path.relative(projectConfig.sourceDir, dependencyConfig.projectPath)
+  );
+
+  removeProjectFromLibraries(libraries, file);
+
+  getProducts(dependencyProject).forEach(product => {
+    removeFromStaticLibraries(project, product, {
+      target: project.getFirstTarget().uuid,
+    });
+  });
+
+  removeFromHeaderSearchPaths(
+    project,
+    dependencyConfig.projectPath
+  );
+
+  fs.writeFileSync(
+    projectConfig.pbxprojPath,
+    project.writeSync()
+  );
 
   return true;
 };
