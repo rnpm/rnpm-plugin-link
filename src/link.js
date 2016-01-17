@@ -2,6 +2,7 @@ const spawn = require('child_process').spawn;
 const path = require('path');
 const log = require('npmlog');
 const uniq = require('lodash.uniq');
+const makeHook = require('rnpm-hooks');
 const async = require('async');
 
 const isEmpty = require('./isEmpty');
@@ -11,25 +12,6 @@ const copyAssetsAndroid = require('./android/copyAssets');
 const copyAssetsIOS = require('./ios/copyAssets');
 
 log.heading = 'rnpm-link';
-
-const makeHook = (dependency, name) => (cb) => {
-  if (!dependency.config.hooks || !dependency.config.hooks[name]) {
-    return cb();
-  }
-
-  const hook = spawn(dependency.config.hooks[name], {
-    stdio: 'inherit',
-    stdin: 'inherit',
-  });
-
-  hook.on('close', function prelink(code) {
-    if (code) {
-      cb(new Error(`Failed to link a "${dependency.name}" module`));
-    }
-
-    cb();
-  });
-};
 
 /**
  * Returns an array of dependencies that should be linked/checked.
@@ -113,11 +95,29 @@ module.exports = function link(config, args, callback) {
   };
 
   const tasks = dependencies.map((dependency) => (next) => {
-    const prelink = makeHook(dependency, 'prelink');
-    const postlink = makeHook(dependency, 'postlink');
-    const link = makeLink(dependency);
+    const queue = [];
 
-    async.waterfall([prelink, link, postlink, next]);
+    var prelink;
+    var postlink;
+
+    if (dependency.config.hooks) {
+      prelink = dependency.config.hooks.prelink;
+      postlink = dependency.config.hooks.postlink;
+    }
+
+    if (prelink) {
+      queue.push(makeHook(prelink));
+    }
+
+    queue.push(makeLink(dependency));
+
+    if (postlink) {
+      queue.push(makeHook(postlink));
+    }
+
+    queue.push(next);
+
+    async.waterfall(queue);
   });
 
   async.series(tasks, callback || () => {});

@@ -85,6 +85,8 @@ describe('link', () => {
       registerNativeModule
     );
 
+    const link = require('../src/link');
+
     link(config, ['react-native-blur'], () => {
       expect(registerNativeModule.calledTwice).to.be.true;
     });
