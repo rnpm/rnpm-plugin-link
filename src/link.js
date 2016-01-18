@@ -1,8 +1,6 @@
-const spawn = require('child_process').spawn;
 const path = require('path');
 const log = require('npmlog');
 const uniq = require('lodash.uniq');
-const makeHook = require('rnpm-hooks');
 const async = require('async');
 
 const isEmpty = require('./isEmpty');
@@ -100,19 +98,19 @@ module.exports = function link(config, args, callback) {
     var prelink;
     var postlink;
 
-    if (dependency.config.hooks) {
-      prelink = dependency.config.hooks.prelink;
-      postlink = dependency.config.hooks.postlink;
+    if (dependency.config.commands) {
+      prelink = dependency.config.commands.prelink;
+      postlink = dependency.config.commands.postlink;
     }
 
     if (prelink) {
-      queue.push(makeHook(prelink));
+      queue.push(prelink);
     }
 
     queue.push(makeLink(dependency));
 
     if (postlink) {
-      queue.push(makeHook(postlink));
+      queue.push(postlink);
     }
 
     async.waterfall(queue, next);
