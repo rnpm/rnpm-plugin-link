@@ -115,9 +115,7 @@ module.exports = function link(config, args, callback) {
       queue.push(makeHook(postlink));
     }
 
-    queue.push(next);
-
-    async.waterfall(queue);
+    async.waterfall(queue, next);
   });
 
   async.series(tasks, callback || () => {});
