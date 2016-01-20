@@ -1,14 +1,17 @@
 const path = require('path');
 const log = require('npmlog');
 const uniq = require('lodash.uniq');
+const async = require('async');
 
 const isEmpty = require('./isEmpty');
 const registerDependencyAndroid = require('./android/registerNativeModule');
 const registerDependencyIOS = require('./ios/registerNativeModule');
-const linkAssetsAndroid = require('./android/copyAssets');
-const linkAssetsIOS = require('./ios/linkAssets');
+const copyAssetsAndroid = require('./android/copyAssets');
+const copyAssetsIOS = require('./ios/copyAssets');
 
 log.heading = 'rnpm-link';
+
+const commandStub = (cb) => cb();
 
 /**
  * Returns an array of dependencies that should be linked/checked.
@@ -23,7 +26,7 @@ const getProjectDependencies = () => {
  *
  * If optional argument [packageName] is provided, it's the only one that's checked
  */
-module.exports = function link(config, args) {
+module.exports = function link(config, args, callback) {
 
   try {
     const project = config.getProjectConfig();
@@ -51,7 +54,15 @@ module.exports = function link(config, args) {
     })
     .filter(dependency => dependency);
 
-  dependencies.forEach(dependency => {
+  const assets = uniq(
+    dependencies.reduce(
+      (assets, dependency) => assets.concat(dependency.config.assets),
+      project.assets
+    ),
+    asset => path.basename(asset)
+  );
+
+  const makeLink = (dependency) => (cb) => {
     if (project.android && dependency.config.android) {
       log.info(`Linking ${dependency.name} android dependency`);
       registerDependencyAndroid(
@@ -65,27 +76,31 @@ module.exports = function link(config, args) {
       log.info(`Linking ${dependency.name} ios dependency`);
       registerDependencyIOS(dependency.config.ios, project.ios);
     }
-  });
 
-  const assets = uniq(
-    dependencies.reduce(
-      (assets, dependency) => assets.concat(dependency.config.assets),
-      project.assets
-    ),
-    asset => path.basename(asset)
+    if (isEmpty(assets)) {
+      return cb();
+    }
+
+    if (project.ios) {
+      log.info('Linking assets to ios project');
+      copyAssetsIOS(assets, project.ios);
+    }
+
+    if (project.android) {
+      log.info('Linking assets to android project');
+      copyAssetsAndroid(assets, project.android.assetsPath);
+    }
+
+    cb();
+  };
+
+  const tasks = dependencies.map((dependency) => (next) =>
+    async.waterfall([
+      dependency.config.commands.prelink || commandStub,
+      makeLink(dependency),
+      dependency.config.commands.postlink || commandStub,
+    ], next)
   );
 
-  if (isEmpty(assets)) {
-    return;
-  }
-
-  if (project.ios) {
-    log.info('Linking assets to ios project');
-    linkAssetsIOS(assets, project.ios);
-  }
-
-  if (project.android) {
-    log.info('Linking assets to android project');
-    linkAssetsAndroid(assets, project.android.assetsPath);
-  }
+  async.series(tasks, callback || () => {});
 };
