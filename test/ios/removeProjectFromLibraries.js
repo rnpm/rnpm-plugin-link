@@ -3,26 +3,31 @@ const expect = chai.expect;
 const xcode = require('xcode');
 const PbxFile = require('xcode/lib/pbxFile');
 const addProjectToLibraries = require('../../src/ios/addProjectToLibraries');
+const removeProjectFromLibraries = require('../../src/ios/removeProjectFromLibraries');
 const lastItem = require('../../src/lastItem');
 
 const project = xcode.project('test/fixtures/project.pbxproj');
 
-describe('ios::addProjectToLibraries', () => {
+describe('ios::removeProjectFromLibraries', () => {
 
   beforeEach(() => {
     project.parseSync();
+
+    addProjectToLibraries(
+      project.pbxGroupByName('Libraries'),
+      new PbxFile('fakePath')
+    );
   });
 
-  it('should append file to Libraries group', () => {
+  it('should remove file from Libraries group', () => {
     const file = new PbxFile('fakePath');
     const libraries = project.pbxGroupByName('Libraries');
 
-    addProjectToLibraries(libraries, file);
+    removeProjectFromLibraries(libraries, file);
 
     const child = lastItem(libraries.children);
 
-    expect(child).to.have.keys(['value', 'comment']);
-    expect(child.comment).to.equals(file.basename);
+    expect(child.comment).to.not.equals(file.basename);
   });
 
 });
