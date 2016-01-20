@@ -98,7 +98,7 @@ describe('link', () => {
     const copyAssets = sinon.stub();
 
     mock(
-      '../src/ios/linkAssets.js',
+      '../src/ios/copyAssets.js',
       copyAssets
     );
 
@@ -124,7 +124,7 @@ describe('link', () => {
     const projectAssets = ['Fonts/FontB.ttf', 'Fonts/FontA.ttf'];
 
     mock(
-      '../src/ios/linkAssets.js',
+      '../src/ios/copyAssets.js',
       copyAssets
     );
 
