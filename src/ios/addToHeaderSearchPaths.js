@@ -1,7 +1,5 @@
-const mapHeaderSettings = require('./headerSearchPathIter');
+const mapHeaderSearchPaths = require('./headerSearchPathIter');
 
 module.exports = function addToHeaderSearchPaths(project, path) {
-  mapHeaderSettings(project, headerSearchPaths =>
-    headerSearchPaths.concat(path)
-  );
+  mapHeaderSearchPaths(project, searchPaths => searchPaths.concat(path));
 };

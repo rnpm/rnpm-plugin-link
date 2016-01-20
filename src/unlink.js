@@ -6,7 +6,7 @@ const isEmpty = require('./isEmpty');
 const unregisterDependencyAndroid = require('./android/unregisterNativeModule');
 const unregisterDependencyIOS = require('./ios/unregisterNativeModule');
 const unlinkAssetsAndroid = require('./android/unlinkAssets');
-const unlinkAssetsIOS = require('./ios/unlikAssets');
+const unlinkAssetsIOS = require('./ios/unlinkAssets');
 
 log.heading = 'rnpm-link';
 
@@ -44,10 +44,10 @@ module.exports = function unlink(config, args) {
     }
   }
 
-  if (project.ios && config.ios) {
+  if (project.ios && dependency.ios) {
     log.info(`Unlinking ${packageName} ios dependency`);
 
-    if (unregisterDependencyIOS(config.ios, project.ios)) {
+    if (unregisterDependencyIOS(dependency.ios, project.ios)) {
       log.info(`iOS module ${packageName} has been successfully unlinked`);
     }
   }

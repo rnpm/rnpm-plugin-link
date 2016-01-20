@@ -1,5 +1,11 @@
 const xcode = require('xcode');
+const path = require('path');
+const fs = require('fs');
 
+const getProducts = require('./getProducts');
+const getHeadersInFolder = require('./getHeadersInFolder');
+const isEmpty = require('../isEmpty');
+const getHeaderSearchPath = require('./getHeaderSearchPath');
 const hasLibraryImported = require('./hasLibraryImported');
 const removeFileFromProject = require('./removeFileFromProject');
 const removeProjectFromLibraries = require('./removeProjectFromLibraries');
@@ -11,7 +17,7 @@ const removeFromHeaderSearchPaths = require('./removeFromHeaderSearchPaths');
  *
  * If library is already unlinked, this action is a no-op.
  */
-module.exports = function unregisterNativeModule() {
+module.exports = function unregisterNativeModule(dependencyConfig, projectConfig) {
   const project = xcode.project(projectConfig.pbxprojPath).parseSync();
   const dependencyProject = xcode.project(dependencyConfig.pbxprojPath).parseSync();
 
