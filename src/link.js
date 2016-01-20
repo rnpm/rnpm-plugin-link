@@ -1,4 +1,3 @@
-const spawn = require('child_process').spawn;
 const path = require('path');
 const log = require('npmlog');
 const uniq = require('lodash.uniq');
@@ -12,24 +11,7 @@ const copyAssetsIOS = require('./ios/copyAssets');
 
 log.heading = 'rnpm-link';
 
-const makeHook = (dependency, name) => (cb) => {
-  if (!dependency.config.hooks || !dependency.config.hooks[name]) {
-    return cb();
-  }
-
-  const hook = spawn(dependency.config.hooks[name], {
-    stdio: 'inherit',
-    stdin: 'inherit',
-  });
-
-  hook.on('close', function prelink(code) {
-    if (code) {
-      cb(new Error(`Failed to link a "${dependency.name}" module`));
-    }
-
-    cb();
-  });
-};
+const commandStub = (cb) => cb();
 
 /**
  * Returns an array of dependencies that should be linked/checked.
@@ -112,13 +94,13 @@ module.exports = function link(config, args, callback) {
     cb();
   };
 
-  const tasks = dependencies.map((dependency) => (next) => {
-    const prelink = makeHook(dependency, 'prelink');
-    const postlink = makeHook(dependency, 'postlink');
-    const link = makeLink(dependency);
-
-    async.waterfall([prelink, link, postlink, next]);
-  });
+  const tasks = dependencies.map((dependency) => (next) =>
+    async.waterfall([
+      dependency.config.commands.prelink || commandStub,
+      makeLink(dependency),
+      dependency.config.commands.postlink || commandStub,
+    ], next)
+  );
 
   async.series(tasks, callback || () => {});
 };

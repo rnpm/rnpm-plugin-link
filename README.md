@@ -1,4 +1,4 @@
-rnpm link ![npm version](https://img.shields.io/npm/v/rnpm-plugin-link.svg) ![dependencies](https://img.shields.io/david/rnpm/rnpm-plugin-link.svg) [![Circle CI](https://img.shields.io/circleci/project/rnpm/rnpm-plugin-link/master.svg)](https://circleci.com/gh/rnpm/rnpm-plugin-link) 
+rnpm link ![npm version](https://img.shields.io/npm/v/rnpm-plugin-link.svg) ![dependencies](https://img.shields.io/david/rnpm/rnpm-plugin-link.svg) [![Circle CI](https://img.shields.io/circleci/project/rnpm/rnpm-plugin-link/master.svg)](https://circleci.com/gh/rnpm/rnpm-plugin-link)
 ==========
 
 This plugin is automatically installed with `rnpm`.
@@ -10,6 +10,11 @@ Automatically updates your project by linking all dependencies for Android (if p
 ```bash
 $ rnpm link react-native-module
 ```
+
+## Commands
+`rnpm-plugin-link` supports following commands:
+- `prelink` - runs before the link
+- `postlink` - runs after the link
 
 ## License
 
