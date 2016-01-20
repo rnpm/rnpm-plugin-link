@@ -33,10 +33,13 @@ module.exports = function unregisterNativeModule() {
     });
   });
 
-  removeFromHeaderSearchPaths(
-    project,
-    dependencyConfig.projectPath
-  );
+  const headers = getHeadersInFolder(dependencyConfig.folder);
+  if (!isEmpty(headers)) {
+    removeFromHeaderSearchPaths(
+      project,
+      getHeaderSearchPath(projectConfig.sourceDir, headers)
+    );
+  }
 
   fs.writeFileSync(
     projectConfig.pbxprojPath,
