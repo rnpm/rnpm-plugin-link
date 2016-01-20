@@ -65,16 +65,24 @@ module.exports = function link(config, args, callback) {
   const makeLink = (dependency) => (cb) => {
     if (project.android && dependency.config.android) {
       log.info(`Linking ${dependency.name} android dependency`);
-      registerDependencyAndroid(
+
+      const didLink = registerDependencyAndroid(
         dependency.name,
         dependency.config.android,
         project.android
       );
+
+      if (didLink) {
+        log.info(`Android module ${packageName} has been successfully linked`);
+      }
     }
 
     if (project.ios && dependency.config.ios) {
       log.info(`Linking ${dependency.name} ios dependency`);
-      registerDependencyIOS(dependency.config.ios, project.ios);
+
+      if (registerDependencyIOS(dependency.config.ios, project.ios)) {
+        log.info(`iOS module ${packageName} has been successfully linked`);
+      }
     }
 
     if (isEmpty(assets)) {

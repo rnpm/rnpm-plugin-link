@@ -15,7 +15,7 @@ log.heading = 'rnpm-link';
  *
  * If optional argument [packageName] is provided, it's the only one that's checked
  */
-module.exports = function unlink(config, args) {
+module.exports = function unlink(config, args, callback) {
 
   try {
     const project = config.getProjectConfig();
@@ -66,5 +66,9 @@ module.exports = function unlink(config, args) {
   if (project.android) {
     log.info('Unlinking assets from android project');
     unlinkAssetsAndroid(assets, project.android.assetsPath);
+  }
+
+  if (callback) {
+    callback();
   }
 };
