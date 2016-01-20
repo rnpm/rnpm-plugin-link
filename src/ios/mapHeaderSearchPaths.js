@@ -11,7 +11,7 @@
  * we assume we want to modify that section either
  *
  * Important: That function mutates `buildSettings` and it's not pure thus you should
- * not rely on it's return value
+ * not rely on its return value
  */
 module.exports = function headerSearchPathIter(project, func) {
   const config = project.pbxXCBuildConfigurationSection();
