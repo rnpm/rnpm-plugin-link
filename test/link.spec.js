@@ -34,7 +34,7 @@ describe('link', () => {
   it('should accept a name of a dependency to link', (done) => {
     const config = {
       getProjectConfig: () => ({ assets: [] }),
-      getDependencyConfig: sinon.stub().returns({ assets: [] }),
+      getDependencyConfig: sinon.stub().returns({ assets: [], commands: {} }),
     };
 
     link(config, ['react-native-gradient'], () => {
@@ -48,7 +48,7 @@ describe('link', () => {
   it('should read dependencies from package.json when name not provided', (done) => {
     const config = {
       getProjectConfig: () => ({ assets: [] }),
-      getDependencyConfig: sinon.stub().returns({ assets: [] }),
+      getDependencyConfig: sinon.stub().returns({ assets: [], commands: {} }),
     };
 
     mock(
@@ -72,7 +72,7 @@ describe('link', () => {
     const registerNativeModule = sinon.stub();
     const config = {
       getProjectConfig: () => ({ android: {}, ios: {}, assets: [] }),
-      getDependencyConfig: sinon.stub().returns({ android: {}, ios: {}, assets: [] }),
+      getDependencyConfig: sinon.stub().returns({ android: {}, ios: {}, assets: [], commands: {} }),
     };
 
     mock(
@@ -104,7 +104,7 @@ describe('link', () => {
 
     const config = {
       getProjectConfig: () => ({ ios: {}, assets: projectAssets }),
-      getDependencyConfig: sinon.stub().returns({ assets: dependencyAssets }),
+      getDependencyConfig: sinon.stub().returns({ assets: dependencyAssets, commands: {} }),
     };
 
     const link = require('../src/link');
@@ -130,7 +130,7 @@ describe('link', () => {
 
     const config = {
       getProjectConfig: () => ({ ios: {}, assets: projectAssets }),
-      getDependencyConfig: sinon.stub().returns({ assets: dependencyAssets }),
+      getDependencyConfig: sinon.stub().returns({ assets: dependencyAssets, commands: {} }),
     };
 
     const link = require('../src/link');
