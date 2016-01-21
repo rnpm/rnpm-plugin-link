@@ -39,7 +39,11 @@ module.exports = function unlink(config, args, callback) {
   if (project.android && dependency.android) {
     log.info(`Unlinking ${packageName} android dependency`);
 
-    const didUnlinkAndroid = unregisterDependencyAndroid(packageName, dependency.android, project.android);
+    const didUnlinkAndroid = unregisterDependencyAndroid(
+      packageName,
+      dependency.android,
+      project.android
+    );
 
     if (didUnlinkAndroid) {
       log.info(`Android module ${packageName} has been successfully unlinked`);
