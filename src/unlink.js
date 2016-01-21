@@ -39,16 +39,24 @@ module.exports = function unlink(config, args, callback) {
   if (project.android && dependency.android) {
     log.info(`Unlinking ${packageName} android dependency`);
 
-    if (unregisterDependencyAndroid(packageName, dependency.android, project.android)) {
+    const didUnlinkAndroid = unregisterDependencyAndroid(packageName, dependency.android, project.android);
+
+    if (didUnlinkAndroid) {
       log.info(`Android module ${packageName} has been successfully unlinked`);
+    } else {
+      log.info(`Android module ${packageName} is not linked yet`);
     }
   }
 
   if (project.ios && dependency.ios) {
     log.info(`Unlinking ${packageName} ios dependency`);
 
-    if (unregisterDependencyIOS(dependency.ios, project.ios)) {
+    const didUnlinkIOS = unregisterDependencyIOS(dependency.ios, project.ios);
+
+    if (didUnlinkIOS) {
       log.info(`iOS module ${packageName} has been successfully unlinked`);
+    } else {
+      log.info(`iOS module ${packageName} is not linked yet`);
     }
   }
 
@@ -59,7 +67,7 @@ module.exports = function unlink(config, args, callback) {
   }
 
   if (project.ios) {
-    log.info('Unlinking assets to ios project');
+    log.info('Unlinking assets from ios project');
     unlinkAssetsIOS(assets, project.ios);
   }
 
@@ -67,6 +75,8 @@ module.exports = function unlink(config, args, callback) {
     log.info('Unlinking assets from android project');
     unlinkAssetsAndroid(assets, project.android.assetsPath);
   }
+
+  log.info(`${packageName} assets has been successfully unlinked from your project`);
 
   if (callback) {
     callback();

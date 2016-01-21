@@ -25,22 +25,28 @@ const makeLink = (project, dependency) => (cb) => {
   if (project.android && dependency.config.android) {
     log.info(`Linking ${dependency.name} android dependency`);
 
-    const didLink = registerDependencyAndroid(
+    const didLinkAndroid = registerDependencyAndroid(
       dependency.name,
       dependency.config.android,
       project.android
     );
 
-    if (didLink) {
+    if (didLinkAndroid) {
       log.info(`Android module ${packageName} has been successfully linked`);
+    } else {
+      log.info(`Android module ${packageName} is already linked`);
     }
   }
 
   if (project.ios && dependency.config.ios) {
     log.info(`Linking ${dependency.name} ios dependency`);
 
-    if (registerDependencyIOS(dependency.config.ios, project.ios)) {
+    const didLinkIOS = registerDependencyIOS(dependency.config.ios, project.ios);
+
+    if (didLinkIOS) {
       log.info(`iOS module ${packageName} has been successfully linked`);
+    } else {
+      log.info(`iOS module ${packageName} is already linked`);
     }
   }
 
@@ -61,6 +67,8 @@ const makeLinkAssets = (project, assets) => (cb) => {
     log.info('Linking assets to android project');
     copyAssetsAndroid(assets, project.android.assetsPath);
   }
+
+  log.info(`Assets has been successfully linked to your project`);
 
   cb();
 };
