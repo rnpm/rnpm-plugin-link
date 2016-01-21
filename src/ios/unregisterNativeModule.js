@@ -1,48 +1,47 @@
 const xcode = require('xcode');
-const fs = require('fs');
 const path = require('path');
+const fs = require('fs');
 
-const addToHeaderSearchPaths = require('./addToHeaderSearchPaths');
-const getHeadersInFolder = require('./getHeadersInFolder');
-const getHeaderSearchPath = require('./getHeaderSearchPath');
 const getProducts = require('./getProducts');
-const hasLibraryImported = require('./hasLibraryImported');
-const addFileToProject = require('./addFileToProject');
-const addProjectToLibraries = require('./addProjectToLibraries');
+const getHeadersInFolder = require('./getHeadersInFolder');
 const isEmpty = require('../isEmpty');
+const getHeaderSearchPath = require('./getHeaderSearchPath');
+const hasLibraryImported = require('./hasLibraryImported');
+const removeFileFromProject = require('./removeFileFromProject');
+const removeProjectFromLibraries = require('./removeProjectFromLibraries');
+const removeFromStaticLibraries = require('./removeFromStaticLibraries');
+const removeFromHeaderSearchPaths = require('./removeFromHeaderSearchPaths');
 
 /**
- * Register native module IOS adds given dependency to project by adding
- * its xcodeproj to project libraries as well as attaching static library
- * to the first target (the main one)
+ * Unregister native module IOS
  *
- * If library is already linked, this action is a no-op.
+ * If library is already unlinked, this action is a no-op.
  */
-module.exports = function registerNativeModuleIOS(dependencyConfig, projectConfig) {
+module.exports = function unregisterNativeModule(dependencyConfig, projectConfig) {
   const project = xcode.project(projectConfig.pbxprojPath).parseSync();
   const dependencyProject = xcode.project(dependencyConfig.pbxprojPath).parseSync();
 
   const libraries = project.pbxGroupByName(projectConfig.libraryFolder);
-  if (hasLibraryImported(libraries, dependencyConfig.projectName)) {
+  if (!hasLibraryImported(libraries, dependencyConfig.projectName)) {
     return false;
   }
 
-  const file = addFileToProject(
+  const file = removeFileFromProject(
     project,
     path.relative(projectConfig.sourceDir, dependencyConfig.projectPath)
   );
 
-  addProjectToLibraries(libraries, file);
+  removeProjectFromLibraries(libraries, file);
 
   getProducts(dependencyProject).forEach(product => {
-    project.addStaticLibrary(product, {
+    removeFromStaticLibraries(project, product, {
       target: project.getFirstTarget().uuid,
     });
   });
 
   const headers = getHeadersInFolder(dependencyConfig.folder);
   if (!isEmpty(headers)) {
-    addToHeaderSearchPaths(
+    removeFromHeaderSearchPaths(
       project,
       getHeaderSearchPath(projectConfig.sourceDir, headers)
     );

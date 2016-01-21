@@ -6,12 +6,13 @@ const plistParser = require('plist');
 const groupFilesByType = require('../groupFilesByType');
 const createGroup = require('./createGroup');
 const getPlistPath = require('./getPlistPath');
+const diff = require('lodash.difference');
 
 /**
- * This function works in a similar manner to its Android version,
- * except it does not copy fonts but creates XCode Group references
+ * Unlinks assets from iOS project. Removes references for fonts from `Info.plist`
+ * fonts provided by application and from `Resources` group
  */
-module.exports = function linkAssetsIOS(files, projectConfig) {
+module.exports = function unlinkAssetsIOS(files, projectConfig) {
   const project = xcode.project(projectConfig.pbxprojPath).parseSync();
   const assets = groupFilesByType(files);
   const plistPath = path.join(projectConfig.sourceDir, getPlistPath(project));
@@ -24,11 +25,9 @@ module.exports = function linkAssetsIOS(files, projectConfig) {
   }
 
   if (!project.pbxGroupByName('Resources')) {
-    createGroup(project, 'Resources');
-
-    log.warn(
+    return log.error(
       'ERRGROUP',
-      `Group 'Resources' does not exist in your XCode project. We have created it automatically for you.`
+      `Group 'Resources' does not exist in your XCode project. There is nothing to unlink.`
     );
   }
 
@@ -38,15 +37,14 @@ module.exports = function linkAssetsIOS(files, projectConfig) {
 
   const fonts = (assets.font || [])
     .map(asset =>
-      project.addResourceFile(
+      project.removeResourceFile(
         path.relative(projectConfig.sourceDir, asset),
         { target: project.getFirstTarget().uuid }
       )
     )
-    .filter(file => file)   // xcode returns false if file is already there
     .map(file => file.basename);
 
-  plist.UIAppFonts = (plist.UIAppFonts || []).concat(fonts);
+  plist.UIAppFonts = diff(plist.UIAppFonts || [], fonts);
 
   fs.writeFileSync(
     projectConfig.pbxprojPath,

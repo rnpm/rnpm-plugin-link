@@ -21,6 +21,58 @@ const getProjectDependencies = () => {
   return Object.keys(pjson.dependencies).filter(name => name !== 'react-native');
 };
 
+const makeLink = (project, dependency) => (cb) => {
+  if (project.android && dependency.config.android) {
+    log.info(`Linking ${dependency.name} android dependency`);
+
+    const didLinkAndroid = registerDependencyAndroid(
+      dependency.name,
+      dependency.config.android,
+      project.android
+    );
+
+    if (didLinkAndroid) {
+      log.info(`Android module ${packageName} has been successfully linked`);
+    } else {
+      log.info(`Android module ${packageName} is already linked`);
+    }
+  }
+
+  if (project.ios && dependency.config.ios) {
+    log.info(`Linking ${dependency.name} ios dependency`);
+
+    const didLinkIOS = registerDependencyIOS(dependency.config.ios, project.ios);
+
+    if (didLinkIOS) {
+      log.info(`iOS module ${packageName} has been successfully linked`);
+    } else {
+      log.info(`iOS module ${packageName} is already linked`);
+    }
+  }
+
+  cb();
+};
+
+const makeLinkAssets = (project, assets) => (cb) => {
+  if (isEmpty(assets)) {
+    return cb();
+  }
+
+  if (project.ios) {
+    log.info('Linking assets to ios project');
+    copyAssetsIOS(assets, project.ios);
+  }
+
+  if (project.android) {
+    log.info('Linking assets to android project');
+    copyAssetsAndroid(assets, project.android.assetsPath);
+  }
+
+  log.info(`Assets has been successfully linked to your project`);
+
+  cb();
+};
+
 /**
  * Updates project and linkes all dependencies to it
  *
@@ -54,6 +106,14 @@ module.exports = function link(config, args, callback) {
     })
     .filter(dependency => dependency);
 
+  const tasks = dependencies.map((dependency) => (next) =>
+    async.waterfall([
+      dependency.config.commands.prelink || commandStub,
+      makeLink(project, dependency),
+      dependency.config.commands.postlink || commandStub,
+    ], next)
+  );
+
   const assets = uniq(
     dependencies.reduce(
       (assets, dependency) => assets.concat(dependency.config.assets),
@@ -62,45 +122,7 @@ module.exports = function link(config, args, callback) {
     asset => path.basename(asset)
   );
 
-  const makeLink = (dependency) => (cb) => {
-    if (project.android && dependency.config.android) {
-      log.info(`Linking ${dependency.name} android dependency`);
-      registerDependencyAndroid(
-        dependency.name,
-        dependency.config.android,
-        project.android
-      );
-    }
-
-    if (project.ios && dependency.config.ios) {
-      log.info(`Linking ${dependency.name} ios dependency`);
-      registerDependencyIOS(dependency.config.ios, project.ios);
-    }
-
-    if (isEmpty(assets)) {
-      return cb();
-    }
-
-    if (project.ios) {
-      log.info('Linking assets to ios project');
-      copyAssetsIOS(assets, project.ios);
-    }
-
-    if (project.android) {
-      log.info('Linking assets to android project');
-      copyAssetsAndroid(assets, project.android.assetsPath);
-    }
-
-    cb();
-  };
-
-  const tasks = dependencies.map((dependency) => (next) =>
-    async.waterfall([
-      dependency.config.commands.prelink || commandStub,
-      makeLink(dependency),
-      dependency.config.commands.postlink || commandStub,
-    ], next)
-  );
+  tasks.push(makeLinkAssets(project, assets));
 
   async.series(tasks, callback || () => {});
 };
