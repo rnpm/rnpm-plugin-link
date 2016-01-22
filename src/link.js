@@ -32,9 +32,9 @@ const makeLink = (project, dependency) => (cb) => {
     );
 
     if (didLinkAndroid) {
-      log.info(`Android module ${packageName} has been successfully linked`);
+      log.info(`Android module ${dependency.name} has been successfully linked`);
     } else {
-      log.info(`Android module ${packageName} is already linked`);
+      log.info(`Android module ${dependency.name} is already linked`);
     }
   }
 
@@ -44,9 +44,9 @@ const makeLink = (project, dependency) => (cb) => {
     const didLinkIOS = registerDependencyIOS(dependency.config.ios, project.ios);
 
     if (didLinkIOS) {
-      log.info(`iOS module ${packageName} has been successfully linked`);
+      log.info(`iOS module ${dependency.name} has been successfully linked`);
     } else {
-      log.info(`iOS module ${packageName} is already linked`);
+      log.info(`iOS module ${dependency.name} is already linked`);
     }
   }
 
