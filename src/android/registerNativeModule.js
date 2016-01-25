@@ -1,7 +1,6 @@
-const path = require('path');
-const semver = require('semver');
 const fs = require('fs-extra');
 const compose = require('lodash.flowright');
+const getPrefix = require('./getPrefix');
 
 const readFile = (file) =>
   () => fs.readFileSync(file, 'utf8');
@@ -11,15 +10,7 @@ const writeFile = (file, content) => content ?
   (c) => fs.writeFileSync(file, c, 'utf8');
 
 module.exports = function registerNativeAndroidModule(name, dependencyConfig, projectConfig) {
-  const rnpkg = require(
-    path.join(projectConfig.folder, 'node_modules', 'react-native', 'package.json')
-  );
-
-  var prefix = 'patches/0.18';
-
-  if (semver.lt(rnpkg.version, '0.18.0')) {
-    prefix = 'patches/0.17';
-  }
+  const prefix = getPrefix(projectConfig);
 
   const makeSettingsPatch = require(`./${prefix}/makeSettingsPatch`);
   const makeBuildPatch = require(`./${prefix}/makeBuildPatch`);
