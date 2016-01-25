@@ -142,6 +142,32 @@ describe('link', () => {
     });
   });
 
+  it('require a specific patch for react-native < 0.18', () => {
+    const spy = sinon.spy();
+    mock('node_modules/react-native/package.json', {
+      version: '0.17.0',
+    });
+
+    mock('../src/android/patches/0.17', spy);
+    const registerAndroid = require('../src/android/registerNativeModule');
+
+    registerAndroid({}, {}, { folder: './' });
+    expect(spy.calledOnce).to.be.true;
+  });
+
+  it('require a specific patch for react-native > 0.18', () => {
+    const spy = sinon.spy();
+    mock('node_modules/react-native/package.json', {
+      version: '0.18.0',
+    });
+
+    mock('../src/android/patches/0.18', spy);
+    const registerAndroid = require('../src/android/registerNativeModule');
+
+    registerAndroid({}, {}, { folder: './' });
+    expect(spy.calledOnce).to.be.true;
+  });
+
   afterEach(() => {
     mock.stopAll();
   });
