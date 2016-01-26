@@ -4,6 +4,7 @@ const append = (scope, pattern, patch) =>
 module.exports = function makeMainActivityPatch(config) {
   const importPattern = `import android.app.Activity;`;
   const packagePattern = `.addPackage(new MainReactPackage())`;
+
   /**
    * Make a MainActivity.java program patcher
    * @param  {String}   importPath Import path, e.g. com.oblador.vectoricons.VectorIconsPackage;
