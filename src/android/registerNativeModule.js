@@ -12,8 +12,8 @@ const writeFile = (file, content) => content ?
 module.exports = function registerNativeAndroidModule(name, dependencyConfig, projectConfig) {
   const prefix = getPrefix(projectConfig);
 
-  const makeSettingsPatch = require(`./${prefix}/makeSettingsPatch`);
-  const makeBuildPatch = require(`./${prefix}/makeBuildPatch`);
+  const makeSettingsPatch = require(`./patches/makeSettingsPatch`);
+  const makeBuildPatch = require(`./patches/makeBuildPatch`);
   const makeMainActivityPatch = require(`./${prefix}/makeMainActivityPatch`);
 
   const applySettingsPatch = makeSettingsPatch.apply(null, arguments);
