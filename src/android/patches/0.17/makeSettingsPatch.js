@@ -1,8 +1,5 @@
 const path = require('path');
 
-const append = (scope, pattern, patch) =>
-  scope.replace(pattern, `${pattern}\n${patch}`);
-
 module.exports = function makeSettingsPatch(name, dependencyConfig, projectConfig) {
   const relative = path.relative(
     projectConfig.sourceDir,
@@ -20,6 +17,6 @@ module.exports = function makeSettingsPatch(name, dependencyConfig, projectConfi
       `project(':${name}').projectDir = ` +
       `new File(rootProject.projectDir, '${relative}')`;
 
-    return append(content, pattern, patch);
+    return content.replace(pattern, `${pattern}\n${patch}`);
   };
 };

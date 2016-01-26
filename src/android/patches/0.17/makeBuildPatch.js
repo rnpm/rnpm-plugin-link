@@ -1,6 +1,3 @@
-const append = (scope, pattern, patch) =>
-  scope.replace(pattern, `${pattern}\n${patch}`);
-
 module.exports = function makeBuildPatch(name) {
   /**
    * Replace pattern by patch in the passed content
@@ -11,6 +8,6 @@ module.exports = function makeBuildPatch(name) {
     const pattern = `dependencies {`;
     const patch = `    compile project(':${name}')`;
 
-    return append(content, pattern, patch);
+    return content.replace(pattern, `${pattern}\n${patch}`);
   };
 };
