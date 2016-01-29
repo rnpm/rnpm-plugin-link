@@ -24,6 +24,7 @@ module.exports = function unregisterNativeAndroidModule(name, dependencyConfig, 
   const cutModuleFromBuild = (name) => (content) =>
     cut(content, `    compile project(':${name}')`);
 
+  // @todo that does not work with 0.18 onwards
   const getMainActivityPatch = () =>
     `                .addPackage(${dependencyConfig.packageInstance})`;
 
