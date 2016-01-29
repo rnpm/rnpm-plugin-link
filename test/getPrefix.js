@@ -1,6 +1,6 @@
 const chai = require('chai');
 const expect = chai.expect;
-const getMainActivityPatch = require('../../src/android/getPrefix');
+const getMainActivityPatch = require('../src/android/getPrefix');
 const newPrefix = 'patches/0.18';
 const oldPrefix = 'patches/0.17';
 
