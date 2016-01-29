@@ -1,4 +1,5 @@
-const fs = require('./fs');
+const readFile = require('./fs').readFile;
+const writeFile = require('./fs').writeFile;
 const compose = require('lodash.flowright');
 const getReactVersion = require('../getReactNativeVersion');
 const getPrefix = require('./getPrefix');
@@ -15,21 +16,21 @@ module.exports = function registerNativeAndroidModule(name, dependencyConfig, pr
   const applyMainActivityPatch = makeMainActivityPatch(dependencyConfig);
 
   const performSettingsGradlePatch = compose(
-    fs.writeFile(projectConfig.settingsGradlePath),
+    writeFile(projectConfig.settingsGradlePath),
     applySettingsPatch,
-    fs.readFile(projectConfig.settingsGradlePath)
+    readFile(projectConfig.settingsGradlePath)
   );
 
   const performBuildGradlePatch = compose(
-    fs.writeFile(projectConfig.buildGradlePath),
+    writeFile(projectConfig.buildGradlePath),
     applyBuildPath,
-    fs.readFile(projectConfig.buildGradlePath)
+    readFile(projectConfig.buildGradlePath)
   );
 
   const performMainActivityPatch = compose(
-    fs.writeFile(projectConfig.mainActivityPath),
+    writeFile(projectConfig.mainActivityPath),
     applyMainActivityPatch,
-    fs.readFile(projectConfig.mainActivityPath)
+    readFile(projectConfig.mainActivityPath)
   );
 
   /**
@@ -37,7 +38,7 @@ module.exports = function registerNativeAndroidModule(name, dependencyConfig, pr
    */
   const isInstalled = compose(
     (content) => ~content.indexOf(dependencyConfig.packageInstance),
-    fs.readFile(projectConfig.mainActivityPath)
+    readFile(projectConfig.mainActivityPath)
   );
 
   if (!isInstalled(name)) {

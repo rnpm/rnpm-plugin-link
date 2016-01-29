@@ -1,4 +1,5 @@
-const fs = require('./fs');
+const readFile = require('./fs').readFile;
+const writeFile = require('./fs').writeFile;
 const path = require('path');
 const compose = require('lodash.flowright');
 const getPrefix = require('./getPrefix');
@@ -41,21 +42,21 @@ module.exports = function unregisterNativeAndroidModule(name, dependencyConfig, 
   };
 
   const applySettingsGradlePatch = compose(
-    fs.writeFile(projectConfig.settingsGradlePath),
+    writeFile(projectConfig.settingsGradlePath),
     cutModuleFromSettings(name),
-    fs.readFile(projectConfig.settingsGradlePath)
+    readFile(projectConfig.settingsGradlePath)
   );
 
   const applyBuildGradlePatch = compose(
-    fs.writeFile(projectConfig.buildGradlePath),
+    writeFile(projectConfig.buildGradlePath),
     cutModuleFromBuild(name),
-    fs.readFile(projectConfig.buildGradlePath)
+    readFile(projectConfig.buildGradlePath)
   );
 
   const applyMainActivityPatch = compose(
-    fs.writeFile(projectConfig.mainActivityPath),
+    writeFile(projectConfig.mainActivityPath),
     makeMainActivityPatcher,
-    fs.readFile(projectConfig.mainActivityPath)
+    readFile(projectConfig.mainActivityPath)
   );
 
   /**
@@ -63,7 +64,7 @@ module.exports = function unregisterNativeAndroidModule(name, dependencyConfig, 
    */
   const isInstalled = compose(
     (content) => ~content.indexOf(getAddPackagePatch()),
-    fs.readFile(projectConfig.mainActivityPath)
+    readFile(projectConfig.mainActivityPath)
   );
 
   if (!isInstalled(name)) {
