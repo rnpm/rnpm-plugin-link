@@ -1,7 +1,7 @@
 const fs = require('./fs');
 const path = require('path');
 const compose = require('lodash.flowright');
-const getPrefix = require('./patches/getPrefix');
+const getPrefix = require('./getPrefix');
 
 const cut = (scope, pattern) =>
   scope.replace(pattern + '\n', '');

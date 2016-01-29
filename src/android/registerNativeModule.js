@@ -1,7 +1,7 @@
 const fs = require('./fs');
 const compose = require('lodash.flowright');
 const getReactVersion = require('../getReactNativeVersion');
-const getPrefix = require('./patches/getPrefix');
+const getPrefix = require('./getPrefix');
 
 module.exports = function registerNativeAndroidModule(name, dependencyConfig, projectConfig) {
   const prefix = getPrefix(getReactVersion(projectConfig.folder));
