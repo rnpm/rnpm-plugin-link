@@ -1,11 +1,14 @@
 const fs = require('./fs');
 const path = require('path');
 const compose = require('lodash.flowright');
+const getPrefix = require('./patches/getPrefix');
 
 const cut = (scope, pattern) =>
   scope.replace(pattern + '\n', '');
 
 module.exports = function unregisterNativeAndroidModule(name, dependencyConfig, projectConfig) {
+  const prefix = getPrefix(getReactVersion(projectConfig.folder));
+
   /**
    * @param  {String} content Content of the Settings.gradle file
    * @return {String}         Patched content of Settings.gradle
@@ -24,9 +27,7 @@ module.exports = function unregisterNativeAndroidModule(name, dependencyConfig, 
   const cutModuleFromBuild = (name) => (content) =>
     cut(content, `    compile project(':${name}')`);
 
-  // @todo that does not work with 0.18 onwards
-  const getMainActivityPatch = () =>
-    `                .addPackage(${dependencyConfig.packageInstance})`;
+  const getMainActivityPatch = require(`./${prefix}/mainActivityPatchSearchPattern`);
 
   /**
    * Make a MainActivity.java program patcher
