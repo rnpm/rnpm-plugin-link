@@ -5,8 +5,11 @@ const expect = chai.expect;
 const makeSettingsPatch = require('../../../src/android/patches/makeSettingsPatch');
 
 const name = 'test';
-const projectConfig = { sourceDir: '.' };
-const dependencyConfig = { sourceDir: `../node_modules/${name}/android` };
+const projectConfig = {
+  sourceDir: '/home/project/android/app',
+  settingsGradlePath: '/home/project/android/settings.gradle',
+};
+const dependencyConfig = { sourceDir: `/home/project/node_modules/${name}/android` };
 const settingsGradle = fs.readFileSync(
   path.join(process.cwd(), 'test/fixtures/android/settings.gradle'),
   'utf-8'
@@ -24,7 +27,7 @@ describe('makeSettingsPatch', () => {
   });
 
   it('should make a correct patch', () => {
-    const patch = makeSettingsPatch('test', dependencyConfig, projectConfig);
+    const patch = makeSettingsPatch(name, dependencyConfig, projectConfig);
     expect(patch(settingsGradle)).to.be.equal(patchedSettingsGradle);
   });
 });
