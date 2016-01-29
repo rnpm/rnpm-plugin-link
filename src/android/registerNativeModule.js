@@ -1,13 +1,12 @@
 const fs = require('./fs');
 const compose = require('lodash.flowright');
-const getPrefix = require('./getPrefix');
+const getReactVersion = require('../getReactNativeVersion');
+const getMainActivityPatch = require('./patches/getMainActivityPatch');
 
 module.exports = function registerNativeAndroidModule(name, dependencyConfig, projectConfig) {
-  const prefix = getPrefix(projectConfig);
-
+  const makeMainActivityPatch = getMainActivityPatch(getReactVersion(projectConfig.folder));
   const makeSettingsPatch = require(`./patches/makeSettingsPatch`);
   const makeBuildPatch = require(`./patches/makeBuildPatch`);
-  const makeMainActivityPatch = require(`./${prefix}/makeMainActivityPatch`);
 
   const applySettingsPatch = makeSettingsPatch.apply(null, arguments);
   const applyBuildPath = makeBuildPatch(name);
