@@ -1,13 +1,6 @@
-const fs = require('fs-extra');
+const fs = require('./fs');
 const path = require('path');
 const compose = require('lodash.flowright');
-
-const readFile = (file) =>
-  () => fs.readFileSync(file, 'utf8');
-
-const writeFile = (file, content) => content ?
-  fs.writeFileSync(file, content, 'utf8') :
-  (c) => fs.writeFileSync(file, c, 'utf8');
 
 const cut = (scope, pattern) =>
   scope.replace(pattern + '\n', '');
@@ -46,21 +39,21 @@ module.exports = function registerNativeAndroidModule(name, dependencyConfig, pr
   };
 
   const applySettingsGradlePatch = compose(
-    writeFile(projectConfig.settingsGradlePath),
+    fs.writeFile(projectConfig.settingsGradlePath),
     cutModuleFromSettings(name),
-    readFile(projectConfig.settingsGradlePath)
+    fs.readFile(projectConfig.settingsGradlePath)
   );
 
   const applyBuildGradlePatch = compose(
-    writeFile(projectConfig.buildGradlePath),
+    fs.writeFile(projectConfig.buildGradlePath),
     cutModuleFromBuild(name),
-    readFile(projectConfig.buildGradlePath)
+    fs.readFile(projectConfig.buildGradlePath)
   );
 
   const applyMainActivityPatch = compose(
-    writeFile(projectConfig.mainActivityPath),
+    fs.writeFile(projectConfig.mainActivityPath),
     makeMainActivityPatcher,
-    readFile(projectConfig.mainActivityPath)
+    fs.readFile(projectConfig.mainActivityPath)
   );
 
   /**
@@ -68,7 +61,7 @@ module.exports = function registerNativeAndroidModule(name, dependencyConfig, pr
    */
   const isInstalled = compose(
     (content) => ~content.indexOf(getMainActivityPatch()),
-    readFile(projectConfig.mainActivityPath)
+    fs.readFile(projectConfig.mainActivityPath)
   );
 
   if (!isInstalled(name)) {
