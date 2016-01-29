@@ -5,7 +5,7 @@ const compose = require('lodash.flowright');
 const cut = (scope, pattern) =>
   scope.replace(pattern + '\n', '');
 
-module.exports = function registerNativeAndroidModule(name, dependencyConfig, projectConfig) {
+module.exports = function unregisterNativeAndroidModule(name, dependencyConfig, projectConfig) {
   /**
    * @param  {String} content Content of the Settings.gradle file
    * @return {String}         Patched content of Settings.gradle
