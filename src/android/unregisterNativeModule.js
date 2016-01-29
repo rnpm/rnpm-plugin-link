@@ -27,7 +27,7 @@ module.exports = function unregisterNativeAndroidModule(name, dependencyConfig, 
   const cutModuleFromBuild = (name) => (content) =>
     cut(content, `    compile project(':${name}')`);
 
-  const getMainActivityPatch = require(`./${prefix}/mainActivityPatchSearchPattern`);
+  const getAddPackagePatch = require(`./${prefix}/addPackagePath`);
 
   /**
    * Make a MainActivity.java program patcher
@@ -37,7 +37,7 @@ module.exports = function unregisterNativeAndroidModule(name, dependencyConfig, 
    */
   const makeMainActivityPatcher = (content) => {
     const patched = cut(content, dependencyConfig.packageImportPath);
-    return cut(patched, getMainActivityPatch());
+    return cut(patched, getAddPackagePatch());
   };
 
   const applySettingsGradlePatch = compose(
@@ -62,7 +62,7 @@ module.exports = function unregisterNativeAndroidModule(name, dependencyConfig, 
    * Check if module has been installed already
    */
   const isInstalled = compose(
-    (content) => ~content.indexOf(getMainActivityPatch()),
+    (content) => ~content.indexOf(getAddPackagePatch()),
     fs.readFile(projectConfig.mainActivityPath)
   );
 

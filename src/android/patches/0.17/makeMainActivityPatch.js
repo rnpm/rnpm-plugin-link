@@ -1,3 +1,5 @@
+const addPackagePatch = require('./addPackagePatch');
+
 const append = (scope, pattern, patch) =>
   scope.replace(pattern, `${pattern}\n${patch}`);
 
@@ -21,7 +23,7 @@ module.exports = function makeMainActivityPatch(config) {
     return append(
       patched,
       packagePattern,
-      `                .addPackage(${config.packageInstance})`
+      addPackagePatch(config)
     );
   };
 };
