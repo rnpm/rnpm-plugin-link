@@ -6,12 +6,14 @@ const oldReactPatch = require('../../src/android/patches/0.17/makeMainActivityPa
 
 describe('getMainActivityPatch', () => {
   it('require a specific patch for react-native < 0.18', () => {
-    expect(getMainActivityPatch('0.17.0-rc1')).to.equals(oldReactPatch);
+    expect(getMainActivityPatch('0.17.0-rc')).to.equals(oldReactPatch);
     expect(getMainActivityPatch('0.17.2')).to.equals(oldReactPatch);
   });
 
   it('require a specific patch for react-native > 0.18', () => {
-    expect(getMainActivityPatch('0.18.0-rc1')).to.equals(newReactPatch);
+    expect(getMainActivityPatch('0.19.0')).to.equals(newReactPatch);
+    expect(getMainActivityPatch('0.19.0-rc')).to.equals(newReactPatch);
+    expect(getMainActivityPatch('0.18.0-rc')).to.equals(newReactPatch);
     expect(getMainActivityPatch('0.18.2')).to.equals(newReactPatch);
   });
 });
