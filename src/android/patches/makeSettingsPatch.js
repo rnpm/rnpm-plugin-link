@@ -2,8 +2,8 @@ const path = require('path');
 
 module.exports = function makeSettingsPatch(name, dependencyConfig, projectConfig) {
   const relative = path.relative(
-    projectConfig.sourceDir,
-    dependencyConfig.settingsGradlePath
+    path.dirname(projectConfig.settingsGradlePath),
+    dependencyConfig.sourceDir
   );
 
   /**
