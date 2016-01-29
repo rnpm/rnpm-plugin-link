@@ -1,16 +1,11 @@
-const fs = require('fs-extra');
+const readFile = require('./fs').readFile;
+const writeFile = require('./fs').writeFile;
 const compose = require('lodash.flowright');
+const getReactVersion = require('../getReactNativeVersion');
 const getPrefix = require('./getPrefix');
 
-const readFile = (file) =>
-  () => fs.readFileSync(file, 'utf8');
-
-const writeFile = (file, content) => content ?
-  fs.writeFileSync(file, content, 'utf8') :
-  (c) => fs.writeFileSync(file, c, 'utf8');
-
 module.exports = function registerNativeAndroidModule(name, dependencyConfig, projectConfig) {
-  const prefix = getPrefix(projectConfig);
+  const prefix = getPrefix(getReactVersion(projectConfig.folder));
 
   const makeSettingsPatch = require(`./patches/makeSettingsPatch`);
   const makeBuildPatch = require(`./patches/makeBuildPatch`);
@@ -54,4 +49,3 @@ module.exports = function registerNativeAndroidModule(name, dependencyConfig, pr
     )();
   }
 };
-

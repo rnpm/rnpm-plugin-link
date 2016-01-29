@@ -1,18 +1,15 @@
-const fs = require('fs-extra');
+const readFile = require('./fs').readFile;
+const writeFile = require('./fs').writeFile;
 const path = require('path');
 const compose = require('lodash.flowright');
-
-const readFile = (file) =>
-  () => fs.readFileSync(file, 'utf8');
-
-const writeFile = (file, content) => content ?
-  fs.writeFileSync(file, content, 'utf8') :
-  (c) => fs.writeFileSync(file, c, 'utf8');
+const getPrefix = require('./getPrefix');
 
 const cut = (scope, pattern) =>
   scope.replace(pattern + '\n', '');
 
-module.exports = function registerNativeAndroidModule(name, dependencyConfig, projectConfig) {
+module.exports = function unregisterNativeAndroidModule(name, dependencyConfig, projectConfig) {
+  const prefix = getPrefix(getReactVersion(projectConfig.folder));
+
   /**
    * @param  {String} content Content of the Settings.gradle file
    * @return {String}         Patched content of Settings.gradle
@@ -31,8 +28,7 @@ module.exports = function registerNativeAndroidModule(name, dependencyConfig, pr
   const cutModuleFromBuild = (name) => (content) =>
     cut(content, `    compile project(':${name}')`);
 
-  const getMainActivityPatch = () =>
-    `                .addPackage(${dependencyConfig.packageInstance})`;
+  const getAddPackagePatch = require(`./${prefix}/addPackagePath`);
 
   /**
    * Make a MainActivity.java program patcher
@@ -42,7 +38,7 @@ module.exports = function registerNativeAndroidModule(name, dependencyConfig, pr
    */
   const makeMainActivityPatcher = (content) => {
     const patched = cut(content, dependencyConfig.packageImportPath);
-    return cut(patched, getMainActivityPatch());
+    return cut(patched, getAddPackagePatch());
   };
 
   const applySettingsGradlePatch = compose(
@@ -67,7 +63,7 @@ module.exports = function registerNativeAndroidModule(name, dependencyConfig, pr
    * Check if module has been installed already
    */
   const isInstalled = compose(
-    (content) => ~content.indexOf(getMainActivityPatch()),
+    (content) => ~content.indexOf(getAddPackagePatch()),
     readFile(projectConfig.mainActivityPath)
   );
 

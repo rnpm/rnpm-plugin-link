@@ -1,14 +1,10 @@
-const path = require('path');
 const semver = require('semver');
 
-module.exports = function getPrefix(config) {
-  const rnpkg = require(
-    path.join(config.folder, 'node_modules', 'react-native', 'package.json')
-  );
-
+module.exports = function getPrefix(rnVersion) {
+  const version = rnVersion.replace('-rc', '');
   var prefix = 'patches/0.18';
 
-  if (semver.lt(rnpkg.version, '0.18.0')) {
+  if (semver.lt(version, '0.18.0')) {
     prefix = 'patches/0.17';
   }
 
