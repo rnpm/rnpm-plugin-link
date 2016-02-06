@@ -37,8 +37,8 @@ module.exports = function registerNativeAndroidModule(name, dependencyConfig, pr
    * Check if module has been installed already
    */
   const isInstalled = compose(
-    (content) => ~content.indexOf(dependencyConfig.packageInstance),
-    readFile(projectConfig.mainActivityPath)
+    (content) => ~content.indexOf(`:"${name}"`) || ~content.indexOf(`':${name}'`),
+    readFile(projectConfig.buildGradlePath)
   );
 
   if (!isInstalled(name)) {
