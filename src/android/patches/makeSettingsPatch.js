@@ -2,8 +2,8 @@ const path = require('path');
 
 module.exports = function makeSettingsPatch(name, dependencyConfig, projectConfig) {
   const projectRoot = projectConfig.isFlat
-    ? projectConfig.sourceDir
-    : path.join(projectConfig.sourceDir, '..');
+    ? path.join(projectConfig.sourceDir, '..')
+    : projectConfig.sourceDir;
 
   const relative = path.relative(projectRoot, dependencyConfig.sourceDir);
 
