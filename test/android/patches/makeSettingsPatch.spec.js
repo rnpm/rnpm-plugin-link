@@ -5,8 +5,7 @@ const expect = chai.expect;
 const makeSettingsPatch = require('../../../src/android/patches/makeSettingsPatch');
 
 const name = 'test';
-const flatProjectConfig = { sourceDir: 'some/path/android' };
-const nestedProjectConfig = { sourceDir: 'some/path/android/app' };
+const projectConfig = { settingsGradlePath: 'some/path/android' };
 const dependencyConfig = { sourceDir: `some/path/node_modules/${name}/android` };
 const settingsGradle = fs.readFileSync(
   path.join(process.cwd(), 'test/fixtures/android/settings.gradle'),
@@ -25,17 +24,12 @@ const patchedNestedSettingsGradle = fs.readFileSync(
 describe('makeSettingsPatch', () => {
   it('should build a patch function', () => {
     expect(
-      makeSettingsPatch(name, dependencyConfig, flatProjectConfig)
+      makeSettingsPatch(name, dependencyConfig, projectConfig)
     ).to.be.a('function');
   });
 
-  it('should make a correct patch for the flat structure', () => {
-    const patch = makeSettingsPatch('test', dependencyConfig, flatProjectConfig);
+  it('should make a correct settings.gradle patch', () => {
+    const patch = makeSettingsPatch('test', dependencyConfig, projectConfig);
     expect(patch(settingsGradle)).to.be.equal(patchedFlatSettingsGradle);
-  });
-
-  it('should make a correct patch for the nested structure', () => {
-    const patch = makeSettingsPatch('test', dependencyConfig, nestedProjectConfig);
-    expect(patch(settingsGradle)).to.be.equal(patchedNestedSettingsGradle);
   });
 });

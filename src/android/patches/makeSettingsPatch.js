@@ -1,11 +1,10 @@
 const path = require('path');
 
 module.exports = function makeSettingsPatch(name, dependencyConfig, projectConfig) {
-  const projectRoot = projectConfig.isFlat
-    ? path.join(projectConfig.sourceDir, '..')
-    : projectConfig.sourceDir;
-
-  const relative = path.relative(projectRoot, dependencyConfig.sourceDir);
+  const relative = path.relative(
+    projectConfig.settingsGradlePath,
+    dependencyConfig.sourceDir
+  );
 
   /**
    * Replace pattern by patch in the passed content
