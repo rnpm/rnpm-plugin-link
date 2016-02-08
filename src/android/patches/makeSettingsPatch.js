@@ -16,6 +16,6 @@ module.exports = function makeSettingsPatch(name, dependencyConfig, projectConfi
       `project(':${name}').projectDir = ` +
       `new File(rootProject.projectDir, '${relative}')`;
 
-    return `${content}\n${patch}`;
+    return `${content.trim()}\n${patch}`;
   };
 };
