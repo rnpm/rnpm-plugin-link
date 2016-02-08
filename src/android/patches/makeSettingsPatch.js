@@ -14,7 +14,7 @@ module.exports = function makeSettingsPatch(name, dependencyConfig, projectConfi
   return function applySettingsPatch(content) {
     const patch = `include ':${name}'\n` +
       `project(':${name}').projectDir = ` +
-      `new File(rootProject.projectDir, '${relative}')`;
+      `new File(rootProject.projectDir, '${relative}')\n`;
 
     return `${content.trim()}\n${patch}`;
   };
