@@ -2,10 +2,11 @@ const readFile = require('./fs').readFile;
 const writeFile = require('./fs').writeFile;
 const path = require('path');
 const compose = require('lodash.flowright');
+const getReactVersion = require('../getReactNativeVersion');
 const getPrefix = require('./getPrefix');
 
 const cut = (scope, pattern) =>
-  scope.replace(pattern + '\n', '');
+  scope.replace(pattern, '');
 
 module.exports = function unregisterNativeAndroidModule(name, dependencyConfig, projectConfig) {
   const prefix = getPrefix(getReactVersion(projectConfig.folder));
@@ -17,7 +18,7 @@ module.exports = function unregisterNativeAndroidModule(name, dependencyConfig, 
   const cutModuleFromSettings = (name) => (content) =>
     cut(content, `include ':${name}'\n` +
       `project(':${name}').projectDir = ` +
-      `new File(rootProject.projectDir, '../node_modules/${name}/android')`
+      `new File(rootProject.projectDir, '../node_modules/${name}/android')\n`
     );
 
   /**
@@ -26,9 +27,9 @@ module.exports = function unregisterNativeAndroidModule(name, dependencyConfig, 
    * @return {String}         Patched content of Build.gradle
    */
   const cutModuleFromBuild = (name) => (content) =>
-    cut(content, `    compile project(':${name}')`);
+    cut(content, `    compile project(':${name}')\n`);
 
-  const getAddPackagePatch = require(`./${prefix}/addPackagePath`);
+  const getAddPackagePatch = require(`./${prefix}/addPackagePatch`);
 
   /**
    * Make a MainActivity.java program patcher
@@ -37,8 +38,8 @@ module.exports = function unregisterNativeAndroidModule(name, dependencyConfig, 
    * @return {Function}            Patcher function
    */
   const makeMainActivityPatcher = (content) => {
-    const patched = cut(content, dependencyConfig.packageImportPath);
-    return cut(patched, getAddPackagePatch());
+    const patched = cut(content, dependencyConfig.packageImportPath + '\n');
+    return cut(patched, getAddPackagePatch(dependencyConfig));
   };
 
   const applySettingsGradlePatch = compose(
@@ -63,7 +64,7 @@ module.exports = function unregisterNativeAndroidModule(name, dependencyConfig, 
    * Check if module has been installed already
    */
   const isInstalled = compose(
-    (content) => ~content.indexOf(getAddPackagePatch()),
+    (content) => ~content.indexOf(getAddPackagePatch(dependencyConfig)),
     readFile(projectConfig.mainActivityPath)
   );
 
