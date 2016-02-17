@@ -13,6 +13,8 @@ module.exports = function unlinkAssetsAndroid(files, targetPath) {
 
   grouped.font.forEach((file) => {
     const filename = path.basename(file);
-    fs.unlinkSync(path.join(targetPath, 'fonts', filename));
+    if (fs.existsSync(filename)) {
+      fs.unlinkSync(path.join(targetPath, 'fonts', filename));
+    }
   });
 };
