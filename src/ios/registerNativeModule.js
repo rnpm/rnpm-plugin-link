@@ -6,6 +6,7 @@ const addToHeaderSearchPaths = require('./addToHeaderSearchPaths');
 const getHeadersInFolder = require('./getHeadersInFolder');
 const getHeaderSearchPath = require('./getHeaderSearchPath');
 const getProducts = require('./getProducts');
+const createGroup = require('./createGroup');
 const hasLibraryImported = require('./hasLibraryImported');
 const addFileToProject = require('./addFileToProject');
 const addProjectToLibraries = require('./addProjectToLibraries');
@@ -23,8 +24,17 @@ module.exports = function registerNativeModuleIOS(dependencyConfig, projectConfi
   const dependencyProject = xcode.project(dependencyConfig.pbxprojPath).parseSync();
 
   const libraries = project.pbxGroupByName(projectConfig.libraryFolder);
-  if (hasLibraryImported(libraries, dependencyConfig.projectName)) {
+  if (libraries && hasLibraryImported(libraries, dependencyConfig.projectName)) {
     return false;
+  }
+
+  if (!libraries) {
+    createGroup(project, projectConfig.libraryFolder);
+
+    log.warn(
+      'ERRGROUP',
+      `Group ${projectConfig.libraryFolder} does not exist in your XCode project. We have created it automatically for you.`
+    );
   }
 
   const file = addFileToProject(

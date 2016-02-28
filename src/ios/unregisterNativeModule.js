@@ -22,7 +22,7 @@ module.exports = function unregisterNativeModule(dependencyConfig, projectConfig
   const dependencyProject = xcode.project(dependencyConfig.pbxprojPath).parseSync();
 
   const libraries = project.pbxGroupByName(projectConfig.libraryFolder);
-  if (!hasLibraryImported(libraries, dependencyConfig.projectName)) {
+  if (!libraries || !hasLibraryImported(libraries, dependencyConfig.projectName)) {
     return false;
   }
 
