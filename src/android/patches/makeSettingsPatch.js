@@ -4,7 +4,7 @@ module.exports = function makeSettingsPatch(name, dependencyConfig, projectConfi
   const relative = path.relative(
     path.dirname(projectConfig.settingsGradlePath),
     dependencyConfig.sourceDir
-  );
+  ).replace(/\\/g, '/');
 
   /**
    * Replace pattern by patch in the passed content
