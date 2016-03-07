@@ -1,12 +1,16 @@
 const semver = require('semver');
+const versions = ['0.20', '0.18', '0.17'];
 
 module.exports = function getPrefix(rnVersion) {
   const version = rnVersion.replace('-rc', '');
-  var prefix = 'patches/0.18';
+  var prefix = 'patches/0.20';
 
-  if (semver.lt(version, '0.18.0')) {
-    prefix = 'patches/0.17';
-  }
+  versions.forEach((item, i) => {
+    const nextVersion = versions[i + 1];
+    if (semver.lt(version, item + '.0') && nextVersion) {
+      prefix = `patches/${nextVersion}`;
+    }
+  });
 
   return prefix;
 };
