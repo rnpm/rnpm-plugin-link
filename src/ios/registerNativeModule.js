@@ -1,6 +1,7 @@
 const xcode = require('xcode');
 const fs = require('fs');
 const path = require('path');
+const log = require('npmlog');
 
 const addToHeaderSearchPaths = require('./addToHeaderSearchPaths');
 const getHeadersInFolder = require('./getHeadersInFolder');
