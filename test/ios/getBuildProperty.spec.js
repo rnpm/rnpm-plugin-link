@@ -5,7 +5,7 @@ const getBuildProperty = require('../../src/ios/getBuildProperty');
 
 const project = xcode.project('test/fixtures/project.pbxproj');
 
-describe('ios::getPlistPath', () => {
+describe('ios::getBuildProperty', () => {
 
   beforeEach(() => {
     project.parseSync();
