@@ -16,10 +16,10 @@ module.exports = function linkAssetsIOS(files, projectConfig) {
   const assets = groupFilesByType(files);
   const plistPath = path.join(projectConfig.sourceDir, getPlistPath(project));
 
-  if (!fs.existsSync(plistPath)) {
+  if (!plistPath || fs.existsSync(plistPath)) {
     return log.error(
       'ERRPLIST',
-      `Could not locate Info.plist file at ${plistPath}. Check if your project has Info.plist set properly`
+      `Could not locate Info.plist. Check if your project has 'INFOPLIST_FILE' set properly`
     );
   }
 
