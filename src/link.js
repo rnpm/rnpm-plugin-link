@@ -11,6 +11,8 @@ const copyAssetsIOS = require('./ios/copyAssets');
 
 log.heading = 'rnpm-link';
 
+const commandStub = () => Promise.resolve();
+
 /**
  * Returns an array of dependencies that should be linked/checked.
  */
@@ -100,7 +102,12 @@ module.exports = function link(config, args) {
     })
     .filter(dependency => dependency);
 
-  const tasks = dependencies.map(dependency => () => linkDependency(project, dependency));
+  const tasks = dependencies.map(dependency => () => {
+    const pre = dependency.config.commands.prelink || commandStub;
+    const post = dependency.config.commands.postlink || commandStub;
+
+    return pre().then(() => linkDependency(project, dependency)).then(post);
+  });
 
   const assets = uniq(
     dependencies.reduce(
