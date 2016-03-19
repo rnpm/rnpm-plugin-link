@@ -1,7 +1,7 @@
 const path = require('path');
 const log = require('npmlog');
 const uniq = require('lodash.uniq');
-const async = require('async');
+const Promise = require('promise');
 
 const isEmpty = require('./isEmpty');
 const registerDependencyAndroid = require('./android/registerNativeModule');
@@ -11,8 +11,6 @@ const copyAssetsIOS = require('./ios/copyAssets');
 
 log.heading = 'rnpm-link';
 
-const commandStub = (cb) => cb();
-
 /**
  * Returns an array of dependencies that should be linked/checked.
  */
@@ -21,7 +19,7 @@ const getProjectDependencies = () => {
   return Object.keys(pjson.dependencies).filter(name => name !== 'react-native');
 };
 
-const makeLink = (project, dependency) => (cb) => {
+const linkDependency = (project, dependency) => {
   if (project.android && dependency.config.android) {
     log.info(`Linking ${dependency.name} android dependency`);
 
@@ -49,13 +47,11 @@ const makeLink = (project, dependency) => (cb) => {
       log.info(`iOS module ${dependency.name} is already linked`);
     }
   }
-
-  cb();
 };
 
-const makeLinkAssets = (project, assets) => (cb) => {
+const linkAssets = (project, assets) => {
   if (isEmpty(assets)) {
-    return cb();
+    return;
   }
 
   if (project.ios) {
@@ -69,8 +65,6 @@ const makeLinkAssets = (project, assets) => (cb) => {
   }
 
   log.info(`Assets has been successfully linked to your project`);
-
-  cb();
 };
 
 /**
@@ -78,13 +72,13 @@ const makeLinkAssets = (project, assets) => (cb) => {
  *
  * If optional argument [packageName] is provided, it's the only one that's checked
  */
-module.exports = function link(config, args, callback) {
+module.exports = function link(config, args) {
 
   try {
     const project = config.getProjectConfig();
   } catch (err) {
     log.error('ERRPACKAGEJSON', `No package found. Are you sure it's a React Native project?`);
-    return;
+    return Promise.reject(err);
   }
 
   const packageName = args[0];
@@ -106,13 +100,7 @@ module.exports = function link(config, args, callback) {
     })
     .filter(dependency => dependency);
 
-  const tasks = dependencies.map((dependency) => (next) =>
-    async.waterfall([
-      dependency.config.commands.prelink || commandStub,
-      makeLink(project, dependency),
-      dependency.config.commands.postlink || commandStub,
-    ], next)
-  );
+  const tasks = dependencies.map(dependency => () => linkDependency(project, dependency));
 
   const assets = uniq(
     dependencies.reduce(
@@ -122,7 +110,7 @@ module.exports = function link(config, args, callback) {
     asset => path.basename(asset)
   );
 
-  tasks.push(makeLinkAssets(project, assets));
+  tasks.push(() => linkAssets(project, assets));
 
-  async.series(tasks, callback || () => {});
+  return Promise.all(tasks.map(task => task()));
 };
