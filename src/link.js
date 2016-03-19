@@ -106,12 +106,12 @@ module.exports = function link(config, args) {
     })
     .filter(dependency => dependency);
 
-  const tasks = dependencies.map(dependency => () => {
+  const tasks = Promise.all(dependencies.map(dependency => {
     const pre = promisify(dependency.config.commands.prelink || commandStub);
     const post = promisify(dependency.config.commands.postlink || commandStub);
 
     return pre().then(() => linkDependency(project, dependency)).then(post);
-  });
+  }));
 
   const assets = uniq(
     dependencies.reduce(
@@ -121,7 +121,5 @@ module.exports = function link(config, args) {
     asset => path.basename(asset)
   );
 
-  tasks.push(() => linkAssets(project, assets));
-
-  return Promise.all(tasks.map(task => task()));
+  return tasks.then(() => linkAssets(project, assets));
 };
