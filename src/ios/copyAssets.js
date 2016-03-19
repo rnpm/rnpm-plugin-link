@@ -16,7 +16,7 @@ module.exports = function linkAssetsIOS(files, projectConfig) {
   const assets = groupFilesByType(files);
   const plistPath = path.join(projectConfig.sourceDir, getPlistPath(project));
 
-  if (!plistPath || fs.existsSync(plistPath)) {
+  if (!plistPath || !fs.existsSync(plistPath)) {
     return log.error(
       'ERRPLIST',
       `Could not locate Info.plist. Check if your project has 'INFOPLIST_FILE' set properly`

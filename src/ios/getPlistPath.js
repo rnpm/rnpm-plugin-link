@@ -6,7 +6,11 @@
  * Returns `null` if INFOPLIST_FILE is not specified.
  */
 module.exports = function getPlistPath(project) {
-  const plistFile = project.getBuildProperty('INFOPLIST_FILE');
+  const target = project.getFirstTarget().firstTarget;
+  const config = project.pbxXCConfigurationList()[target.buildConfigurationList];
+  const buildSection = project.pbxXCBuildConfigurationSection()[config.buildConfigurations[0].value];
+
+  const plistFile = buildSection.buildSettings.INFOPLIST_FILE;
 
   if (!plistFile) {
     return null;
