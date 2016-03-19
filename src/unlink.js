@@ -1,6 +1,5 @@
 const path = require('path');
 const log = require('npmlog');
-const uniq = require('lodash.uniq');
 
 const isEmpty = require('./isEmpty');
 const unregisterDependencyAndroid = require('./android/unregisterNativeModule');

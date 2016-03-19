@@ -1,6 +1,4 @@
-const path = require('path');
 const log = require('npmlog');
-const uniq = require('lodash.uniq');
 const async = require('async');
 
 const isEmpty = require('./isEmpty');
@@ -8,18 +6,12 @@ const registerDependencyAndroid = require('./android/registerNativeModule');
 const registerDependencyIOS = require('./ios/registerNativeModule');
 const copyAssetsAndroid = require('./android/copyAssets');
 const copyAssetsIOS = require('./ios/copyAssets');
+const getProjectDependencies = require('./getProjectDependencies');
+const dedupeAssets = require('./dedupeAssets');
 
 log.heading = 'rnpm-link';
 
 const commandStub = (cb) => cb();
-
-/**
- * Returns an array of dependencies that should be linked/checked.
- */
-const getProjectDependencies = () => {
-  const pjson = require(path.join(process.cwd(), './package.json'));
-  return Object.keys(pjson.dependencies).filter(name => name !== 'react-native');
-};
 
 const makeLink = (project, dependency) => (cb) => {
   if (project.android && dependency.config.android) {
@@ -114,13 +106,10 @@ module.exports = function link(config, args, callback) {
     ], next)
   );
 
-  const assets = uniq(
-    dependencies.reduce(
-      (assets, dependency) => assets.concat(dependency.config.assets),
-      project.assets
-    ),
-    asset => path.basename(asset)
-  );
+  const assets = dedupeAssets(dependencies.reduce(
+    (assets, dependency) => assets.concat(dependency.config.assets),
+    project.assets
+  ));
 
   tasks.push(makeLinkAssets(project, assets));
 

@@ -15,20 +15,14 @@ describe('link', () => {
     delete require.cache[require.resolve('../src/link')];
   });
 
-  // that test suite has to be changed in next PR so we have
-  // fixed behaviour for `getProjectConfig` that's already in master
-  it('should return when run in a folder without package.json', () => {
-    const spy = sinon.spy(log, 'error');
-
+  it('should reject when run in a folder without package.json', (done) => {
     const config = {
       getProjectConfig: () => {
         throw new Error('No package.json found');
       },
     };
 
-    link(config);
-
-    expect(spy.calledWith('ERRPACKAGEJSON')).to.be.true;
+    link(config).catch(() => done());
   });
 
   it('should accept a name of a dependency to link', (done) => {
@@ -114,30 +108,6 @@ describe('link', () => {
       expect(copyAssets.getCall(0).args[0]).to.deep.equals(
         projectAssets.concat(dependencyAssets)
       );
-      done();
-    });
-  });
-
-  it('should remove duplicated assets before copying them', (done) => {
-    const copyAssets = sinon.stub();
-    const dependencyAssets = ['Fonts/FontB.ttf'];
-    const projectAssets = ['Fonts/FontB.ttf', 'Fonts/FontA.ttf'];
-
-    mock(
-      '../src/ios/copyAssets.js',
-      copyAssets
-    );
-
-    const config = {
-      getProjectConfig: () => ({ ios: {}, assets: projectAssets }),
-      getDependencyConfig: sinon.stub().returns({ assets: dependencyAssets, commands: {} }),
-    };
-
-    const link = require('../src/link');
-
-    link(config, ['react-native-blur'], () => {
-      expect(copyAssets.calledOnce).to.be.true;
-      expect(copyAssets.getCall(0).args[0]).to.deep.equals(projectAssets);
       done();
     });
   });
