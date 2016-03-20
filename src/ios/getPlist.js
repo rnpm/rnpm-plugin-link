@@ -3,9 +3,7 @@ const plistParser = require('plist');
 const path = require('path');
 
 /**
- * Returns Info.plist located in the iOS project and removes
- * xcode $(SRCROOT) and other implementation specific decorators, so that
- * return value can be easily used in e.g. path.join calls
+ * Returns Info.plist located in the iOS project
  *
  * Returns `null` if INFOPLIST_FILE is not specified.
  */
