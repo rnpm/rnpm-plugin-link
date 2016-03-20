@@ -21,7 +21,7 @@ const promisify = (func) => () => new Promise((resolve, reject) =>
  */
 const getProjectDependencies = () => {
   const pjson = require(path.join(process.cwd(), './package.json'));
-  return Object.keys(pjson.dependencies).filter(name => name !== 'react-native');
+  return Object.keys(pjson.dependencies || {}).filter(name => name !== 'react-native');
 };
 
 const linkDependency = (project, dependency) => {
