@@ -5,7 +5,7 @@ const log = require('npmlog');
 const plistParser = require('plist');
 const groupFilesByType = require('../groupFilesByType');
 const createGroup = require('./createGroup');
-const getPlistPath = require('./getPlistPath');
+const getPlist = require('./getPlist');
 
 /**
  * This function works in a similar manner to its Android version,
@@ -14,9 +14,9 @@ const getPlistPath = require('./getPlistPath');
 module.exports = function linkAssetsIOS(files, projectConfig) {
   const project = xcode.project(projectConfig.pbxprojPath).parseSync();
   const assets = groupFilesByType(files);
-  const plistPath = path.join(projectConfig.sourceDir, getPlistPath(project));
+  const plist = getPlist(project, projectConfig.sourceDir);
 
-  if (!plistPath || !fs.existsSync(plistPath)) {
+  if (!plist) {
     return log.error(
       'ERRPLIST',
       `Could not locate Info.plist. Check if your project has 'INFOPLIST_FILE' set properly`
@@ -31,10 +31,6 @@ module.exports = function linkAssetsIOS(files, projectConfig) {
       `Group 'Resources' does not exist in your XCode project. We have created it automatically for you.`
     );
   }
-
-  const plist = plistParser.parse(
-    fs.readFileSync(plistPath, 'utf-8')
-  );
 
   const fonts = (assets.font || [])
     .map(asset =>
