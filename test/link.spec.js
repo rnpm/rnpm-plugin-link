@@ -37,7 +37,7 @@ describe('link', () => {
       getDependencyConfig: sinon.stub().returns({ assets: [], commands: {} }),
     };
 
-    link(config, ['react-native-gradient'], () => {
+    link(config, ['react-native-gradient']).then(() => {
       expect(
         config.getDependencyConfig.calledWith('react-native-gradient')
       ).to.be.true;
@@ -60,7 +60,7 @@ describe('link', () => {
       }
     );
 
-    link(config, [], () => {
+    link(config, []).then(() => {
       expect(
         config.getDependencyConfig.calledWith('react-native-test')
       ).to.be.true;
@@ -87,7 +87,7 @@ describe('link', () => {
 
     const link = require('../src/link');
 
-    link(config, ['react-native-blur'], () => {
+    link(config, ['react-native-blur']).then(() => {
       expect(registerNativeModule.calledTwice).to.be.true;
     });
   });
@@ -109,7 +109,7 @@ describe('link', () => {
 
     const link = require('../src/link');
 
-    link(config, ['react-native-blur'], () => {
+    link(config, ['react-native-blur']).then(() => {
       expect(copyAssets.calledOnce).to.be.true;
       expect(copyAssets.getCall(0).args[0]).to.deep.equals(
         projectAssets.concat(dependencyAssets)
@@ -135,7 +135,7 @@ describe('link', () => {
 
     const link = require('../src/link');
 
-    link(config, ['react-native-blur'], () => {
+    link(config, ['react-native-blur']).then(() => {
       expect(copyAssets.calledOnce).to.be.true;
       expect(copyAssets.getCall(0).args[0]).to.deep.equals(projectAssets);
       done();

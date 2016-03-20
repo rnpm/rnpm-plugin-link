@@ -29,7 +29,6 @@
   "homepage": "https://github.com/rnpm/rnpm#readme",
   "license": "MIT",
   "dependencies": {
-    "async": "^1.5.2",
     "fs-extra": "^0.26.2",
     "glob": "^7.0.0",
     "lodash.difference": "^4.0.1",

@@ -15,13 +15,13 @@ log.heading = 'rnpm-link';
  *
  * If optional argument [packageName] is provided, it's the only one that's checked
  */
-module.exports = function unlink(config, args, callback) {
+module.exports = function unlink(config, args) {
 
   try {
     const project = config.getProjectConfig();
   } catch (err) {
     log.error('ERRPACKAGEJSON', `No package found. Are you sure it's a React Native project?`);
-    return;
+    return Promise.reject(err);
   }
 
   const packageName = args[0];
@@ -67,7 +67,7 @@ module.exports = function unlink(config, args, callback) {
   const assets = dependency.assets;
 
   if (isEmpty(assets)) {
-    return;
+    return Promise.resolve();
   }
 
   if (project.ios) {
@@ -82,7 +82,5 @@ module.exports = function unlink(config, args, callback) {
 
   log.info(`${packageName} assets has been successfully unlinked from your project`);
 
-  if (callback) {
-    callback();
-  }
+  return Promise.resolve();
 };
