@@ -1,6 +1,7 @@
 const getBuildProperty = require('./getBuildProperty');
 const plistParser = require('plist');
 const path = require('path');
+const fs = require('fs');
 
 /**
  * Returns Info.plist located in the iOS project

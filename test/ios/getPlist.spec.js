@@ -11,9 +11,13 @@ describe('ios::getPlistPath', () => {
     project.parseSync();
   });
 
-  it.skip('should return path without Xcode $(SRCROOT)', () => {
-    const plistPath = getPlistPath(project);
-    expect(plistPath).to.equals('Basic/Info.plist');
+  it('should return null when `.plist` file missing', () => {
+    const plistPath = getPlist(project, process.cwd());
+    expect(plistPath).to.equals(null);
+  });
+
+  it.skip('should return parsed `plist`', () => {
+    // @todo mock fs here
   });
 
 });
