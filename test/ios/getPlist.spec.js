@@ -5,7 +5,7 @@ const getPlist = require('../../src/ios/getPlist');
 
 const project = xcode.project('test/fixtures/project.pbxproj');
 
-describe('ios::getPlistPath', () => {
+describe('ios::getPlist', () => {
 
   beforeEach(() => {
     project.parseSync();
