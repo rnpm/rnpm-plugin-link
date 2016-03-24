@@ -21,7 +21,11 @@ module.exports = function headerSearchPathIter(project, func) {
     .filter(ref => ref.indexOf('_comment') === -1)
     .forEach(ref => {
       const buildSettings = config[ref].buildSettings;
-      const shouldVisitBuildSettings = (buildSettings.HEADER_SEARCH_PATHS || [])
+      const shouldVisitBuildSettings = (
+          buildSettings.HEADER_SEARCH_PATHS && buildSettings.HEADER_SEARCH_PATHS.constructor === Array ?
+            buildSettings.HEADER_SEARCH_PATHS :
+            []
+        )
         .filter(path => path.indexOf('react-native/React/**'))
         .length > 0;
 
