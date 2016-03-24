@@ -24,7 +24,7 @@ module.exports = function registerNativeModuleIOS(dependencyConfig, projectConfi
   const project = xcode.project(projectConfig.pbxprojPath).parseSync();
   const dependencyProject = xcode.project(dependencyConfig.pbxprojPath).parseSync();
 
-  let libraries = project.pbxGroupByName(projectConfig.libraryFolder);
+  var libraries = project.pbxGroupByName(projectConfig.libraryFolder);
 
   if (!libraries) {
     libraries = createGroup(project, projectConfig.libraryFolder).group;
