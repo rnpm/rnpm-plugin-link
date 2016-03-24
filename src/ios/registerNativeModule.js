@@ -24,18 +24,19 @@ module.exports = function registerNativeModuleIOS(dependencyConfig, projectConfi
   const project = xcode.project(projectConfig.pbxprojPath).parseSync();
   const dependencyProject = xcode.project(dependencyConfig.pbxprojPath).parseSync();
 
-  const libraries = project.pbxGroupByName(projectConfig.libraryFolder);
-  if (libraries && hasLibraryImported(libraries, dependencyConfig.projectName)) {
-    return false;
-  }
+  let libraries = project.pbxGroupByName(projectConfig.libraryFolder);
 
   if (!libraries) {
-    createGroup(project, projectConfig.libraryFolder);
+    libraries = createGroup(project, projectConfig.libraryFolder).group;
 
     log.warn(
       'ERRGROUP',
       `Group ${projectConfig.libraryFolder} does not exist in your XCode project. We have created it automatically for you.`
     );
+  }
+
+  if (hasLibraryImported(libraries, dependencyConfig.projectName)) {
+    return false;
   }
 
   const file = addFileToProject(
