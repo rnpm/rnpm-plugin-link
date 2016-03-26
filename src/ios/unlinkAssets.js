@@ -5,7 +5,7 @@ const log = require('npmlog');
 const plistParser = require('plist');
 const groupFilesByType = require('../groupFilesByType');
 const createGroup = require('./createGroup');
-const getPlistPath = require('./getPlistPath');
+const getPlist = require('./getPlist');
 const diff = require('../diff');
 
 /**
@@ -15,9 +15,9 @@ const diff = require('../diff');
 module.exports = function unlinkAssetsIOS(files, projectConfig) {
   const project = xcode.project(projectConfig.pbxprojPath).parseSync();
   const assets = groupFilesByType(files);
-  const plistPath = path.join(projectConfig.sourceDir, getPlistPath(project));
+  const plist = getPlist(project, projectConfig.sourceDir);
 
-  if (!plistPath || !fs.existsSync(plistPath)) {
+  if (!plist) {
     return log.error(
       'ERRPLIST',
       `Could not locate Info.plist file. Check if your project has 'INFOPLIST_FILE' set properly`
