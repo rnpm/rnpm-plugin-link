@@ -6,7 +6,7 @@ const plistParser = require('plist');
 const groupFilesByType = require('../groupFilesByType');
 const createGroup = require('./createGroup');
 const getPlist = require('./getPlist');
-const diff = require('lodash.difference');
+const diff = require('../diff');
 
 /**
  * Unlinks assets from iOS project. Removes references for fonts from `Info.plist`

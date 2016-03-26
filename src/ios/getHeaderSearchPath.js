@@ -1,5 +1,5 @@
 const path = require('path');
-const union = require('lodash.union');
+const union = require('../union');
 const lastItem = require('../lastItem');
 
 /**
