@@ -1,5 +1,5 @@
 const log = require('npmlog');
-const async = require('async');
+const uniq = require('./uniq');
 
 const isEmpty = require('./isEmpty');
 const registerDependencyAndroid = require('./android/registerNativeModule');
@@ -13,7 +13,11 @@ log.heading = 'rnpm-link';
 
 const commandStub = (cb) => cb();
 
-const makeLink = (project, dependency) => (cb) => {
+const promisify = (func) => () => new Promise((resolve, reject) =>
+  func((err, res) => err ? reject(err) : resolve(res))
+);
+
+const linkDependency = (project, dependency) => {
   if (project.android && dependency.config.android) {
     log.info(`Linking ${dependency.name} android dependency`);
 
@@ -41,13 +45,11 @@ const makeLink = (project, dependency) => (cb) => {
       log.info(`iOS module ${dependency.name} is already linked`);
     }
   }
-
-  cb();
 };
 
-const makeLinkAssets = (project, assets) => (cb) => {
+const linkAssets = (project, assets) => {
   if (isEmpty(assets)) {
-    return cb();
+    return;
   }
 
   if (project.ios) {
@@ -61,8 +63,6 @@ const makeLinkAssets = (project, assets) => (cb) => {
   }
 
   log.info(`Assets has been successfully linked to your project`);
-
-  cb();
 };
 
 /**
@@ -70,13 +70,13 @@ const makeLinkAssets = (project, assets) => (cb) => {
  *
  * If optional argument [packageName] is provided, it's the only one that's checked
  */
-module.exports = function link(config, args, callback) {
+module.exports = function link(config, args) {
 
   try {
     const project = config.getProjectConfig();
   } catch (err) {
     log.error('ERRPACKAGEJSON', `No package found. Are you sure it's a React Native project?`);
-    return;
+    return Promise.reject(err);
   }
 
   const packageName = args[0];
@@ -98,20 +98,17 @@ module.exports = function link(config, args, callback) {
     })
     .filter(dependency => dependency);
 
-  const tasks = dependencies.map((dependency) => (next) =>
-    async.waterfall([
-      dependency.config.commands.prelink || commandStub,
-      makeLink(project, dependency),
-      dependency.config.commands.postlink || commandStub,
-    ], next)
-  );
+  const tasks = Promise.all(dependencies.map(dependency => {
+    const pre = promisify(dependency.config.commands.prelink || commandStub);
+    const post = promisify(dependency.config.commands.postlink || commandStub);
+
+    return pre().then(() => linkDependency(project, dependency)).then(post);
+  }));
 
   const assets = dedupeAssets(dependencies.reduce(
     (assets, dependency) => assets.concat(dependency.config.assets),
     project.assets
   ));
 
-  tasks.push(makeLinkAssets(project, assets));
-
-  async.series(tasks, callback || () => {});
+  return tasks.then(() => linkAssets(project, assets));
 };

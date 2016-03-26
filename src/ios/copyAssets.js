@@ -32,10 +32,6 @@ module.exports = function linkAssetsIOS(files, projectConfig) {
     );
   }
 
-  const plist = plistParser.parse(
-    fs.readFileSync(plistPath, 'utf-8')
-  );
-
   const fonts = (assets.font || [])
     .map(asset =>
       project.addResourceFile(

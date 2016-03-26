@@ -31,10 +31,6 @@ module.exports = function unlinkAssetsIOS(files, projectConfig) {
     );
   }
 
-  const plist = plistParser.parse(
-    fs.readFileSync(plistPath, 'utf-8')
-  );
-
   const fonts = (assets.font || [])
     .map(asset =>
       project.removeResourceFile(
