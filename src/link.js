@@ -7,6 +7,7 @@ const registerDependencyIOS = require('./ios/registerNativeModule');
 const copyAssetsAndroid = require('./android/copyAssets');
 const copyAssetsIOS = require('./ios/copyAssets');
 const getProjectDependencies = require('./getProjectDependencies');
+const getDependencyConfig = require('./getDependencyConfig');
 const dedupeAssets = require('./dedupeAssets');
 
 log.heading = 'rnpm-link';
@@ -81,22 +82,10 @@ module.exports = function link(config, args) {
 
   const packageName = args[0];
 
-  const dependencies =
-    (packageName ? [packageName] : getProjectDependencies())
-    .map(name => {
-      try {
-        return {
-          config: config.getDependencyConfig(name),
-          name,
-        };
-      } catch (err) {
-        log.warn(
-          'ERRINVALIDPROJ',
-          `Project ${name} is not a react-native library`
-        );
-      }
-    })
-    .filter(dependency => dependency);
+  const dependencies = getDependencyConfig(
+    config,
+    packageName ? [packageName] : getProjectDependencies()
+  );
 
   const tasks = Promise.all(dependencies.map(dependency => {
     const pre = promisify(dependency.config.commands.prelink || commandStub);
