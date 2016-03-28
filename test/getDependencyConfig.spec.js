@@ -1,13 +1,23 @@
 const chai = require('chai');
 const expect = chai.expect;
 const getDependencyConfig = require('../src/getDependencyConfig');
+const sinon = require('sinon');
 
 describe('getDependencyConfig', () => {
-  it.skip('should return an array of dependencies\' rnpm config', () => {
+  it('should return an array of dependencies\' rnpm config', () => {
+    const config = {
+      getDependencyConfig: sinon.stub(),
+    };
 
+    expect(getDependencyConfig(config, ['abcd'])).to.be.an.array;
+    expect(config.getDependencyConfig.callCount).to.equals(1);
   });
 
-  it.skip('should filter out invalid react-native projects', () => {
+  it('should filter out invalid react-native projects', () => {
+    const config = {
+      getDependencyConfig: sinon.stub().throws(new Error('Cannot require')),
+    };
 
+    expect(getDependencyConfig(config, ['abcd'])).to.deep.equal([]);
   });
 });
