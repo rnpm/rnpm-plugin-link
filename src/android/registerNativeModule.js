@@ -14,23 +14,19 @@ module.exports = function registerNativeAndroidModule(name, dependencyConfig, pr
   const makeBuildPatch = require(`./patches/makeBuildPatch`);
   const makeMainActivityPatch = require(`./${prefix}/makeMainActivityPatch`);
 
-  const settingsPatch = makeSettingsPatch.apply(null, arguments);
-  const buildPatch = makeBuildPatch(name);
-  const mainActivityPatch = makeMainActivityPatch(dependencyConfig);
-
   const performSettingsGradlePatch = applyPatch(
     projectConfig.settingsGradlePath,
-    settingsPatch
+    makeSettingsPatch.apply(null, arguments)
   );
 
   const performBuildGradlePatch = applyPatch(
     projectConfig.buildGradlePath,
-    buildPatch
+    makeBuildPatch(name)
   );
 
   const performMainActivityPatch = applyPatch(
     mainActivityPath,
-    mainActivityPatch
+    makeMainActivityPatch(dependencyConfig)
   );
 
   /**
