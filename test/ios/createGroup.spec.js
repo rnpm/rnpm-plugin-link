@@ -2,7 +2,7 @@ const chai = require('chai');
 const expect = chai.expect;
 const xcode = require('xcode');
 const createGroup = require('../../src/ios/createGroup');
-const lastItem = require('../../src/lastItem');
+const last = require('lodash').last;
 
 const project = xcode.project('test/fixtures/project.pbxproj');
 
@@ -23,7 +23,7 @@ describe('ios::createGroup', () => {
     const mainGroup = project.getPBXGroupByKey(mainGroupId);
 
     expect(
-      lastItem(mainGroup.children).value
+      last(mainGroup.children).value
     ).to.equals(createdGroup.uuid);
   });
 

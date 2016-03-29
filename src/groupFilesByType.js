@@ -1,4 +1,4 @@
-const groupBy = require('./groupBy');
+const groupBy = require('lodash').groupBy;
 const mime = require('mime');
 
 /**

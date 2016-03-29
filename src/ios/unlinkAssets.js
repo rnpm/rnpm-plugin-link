@@ -6,7 +6,7 @@ const plistParser = require('plist');
 const groupFilesByType = require('../groupFilesByType');
 const createGroup = require('./createGroup');
 const getPlist = require('./getPlist');
-const diff = require('../diff');
+const difference = require('lodash').difference;
 
 /**
  * Unlinks assets from iOS project. Removes references for fonts from `Info.plist`
@@ -40,7 +40,7 @@ module.exports = function unlinkAssetsIOS(files, projectConfig) {
     )
     .map(file => file.basename);
 
-  plist.UIAppFonts = diff(plist.UIAppFonts || [], fonts);
+  plist.UIAppFonts = difference(plist.UIAppFonts || [], fonts);
 
   fs.writeFileSync(
     projectConfig.pbxprojPath,

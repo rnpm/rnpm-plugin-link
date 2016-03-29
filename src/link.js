@@ -1,18 +1,19 @@
 const log = require('npmlog');
-const uniq = require('./uniq');
+const path = require('path');
+const uniq = require('lodash').uniq;
 
-const isEmpty = require('./isEmpty');
+const isEmpty = require('lodash').isEmpty;
 const registerDependencyAndroid = require('./android/registerNativeModule');
 const registerDependencyIOS = require('./ios/registerNativeModule');
 const copyAssetsAndroid = require('./android/copyAssets');
 const copyAssetsIOS = require('./ios/copyAssets');
 const getProjectDependencies = require('./getProjectDependencies');
 const getDependencyConfig = require('./getDependencyConfig');
-const dedupeAssets = require('./dedupeAssets');
 
 log.heading = 'rnpm-link';
 
 const commandStub = (cb) => cb();
+const dedupeAssets = (assets) => uniq(assets, asset => path.basename(asset));
 
 const promisify = (func) => () => new Promise((resolve, reject) =>
   func((err, res) => err ? reject(err) : resolve(res))

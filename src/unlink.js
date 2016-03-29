@@ -1,15 +1,13 @@
 const path = require('path');
 const log = require('npmlog');
 
-const isEmpty = require('./isEmpty');
 const getProjectDependencies = require('./getProjectDependencies');
 const unregisterDependencyAndroid = require('./android/unregisterNativeModule');
 const unregisterDependencyIOS = require('./ios/unregisterNativeModule');
 const unlinkAssetsAndroid = require('./android/unlinkAssets');
 const unlinkAssetsIOS = require('./ios/unlinkAssets');
 const getDependencyConfig = require('./getDependencyConfig');
-const diff = require('./diff');
-const flatMap = require('./flatMap');
+const _ = require('lodash');
 
 log.heading = 'rnpm-link';
 
@@ -69,9 +67,12 @@ module.exports = function unlink(config, args) {
     }
   }
 
-  const assets = diff(dependency.assets, flatMap(allDependencies, d => d.assets));
+  const assets = _.difference(
+    dependency.assets,
+    _.flatten(allDependencies, d => d.assets)
+  );
 
-  if (isEmpty(assets)) {
+  if (_.isEmpty(assets)) {
     return Promise.resolve();
   }
 
