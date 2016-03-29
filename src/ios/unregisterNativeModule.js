@@ -11,6 +11,7 @@ const removeFileFromProject = require('./removeFileFromProject');
 const removeProjectFromLibraries = require('./removeProjectFromLibraries');
 const removeFromStaticLibraries = require('./removeFromStaticLibraries');
 const removeFromHeaderSearchPaths = require('./removeFromHeaderSearchPaths');
+const removeSharedLibraries = require('./addSharedLibraries');
 
 /**
  * Unregister native module IOS
@@ -38,6 +39,8 @@ module.exports = function unregisterNativeModule(dependencyConfig, projectConfig
       target: project.getFirstTarget().uuid,
     });
   });
+
+  removeSharedLibraries(project, dependencyConfig.sharedLibraries);
 
   const headers = getHeadersInFolder(dependencyConfig.folder);
   if (!isEmpty(headers)) {

@@ -2,10 +2,14 @@ const path = require('path');
 const log = require('npmlog');
 
 const isEmpty = require('./isEmpty');
+const getProjectDependencies = require('./getProjectDependencies');
 const unregisterDependencyAndroid = require('./android/unregisterNativeModule');
 const unregisterDependencyIOS = require('./ios/unregisterNativeModule');
 const unlinkAssetsAndroid = require('./android/unlinkAssets');
 const unlinkAssetsIOS = require('./ios/unlinkAssets');
+const getDependencyConfig = require('./getDependencyConfig');
+const diff = require('./diff');
+const flatMap = require('./flatMap');
 
 log.heading = 'rnpm-link';
 
@@ -32,8 +36,10 @@ module.exports = function unlink(config, args) {
       'ERRINVALIDPROJ',
       `Project ${packageName} is not a react-native library`
     );
-    process.exit(1);
+    return Promise.reject(err);
   }
+
+  const allDependencies = getDependencyConfig(config, getProjectDependencies());
 
   if (project.android && dependency.android) {
     log.info(`Unlinking ${packageName} android dependency`);
@@ -63,7 +69,7 @@ module.exports = function unlink(config, args) {
     }
   }
 
-  const assets = dependency.assets;
+  const assets = diff(dependency.assets, flatMap(allDependencies, d => d.assets));
 
   if (isEmpty(assets)) {
     return Promise.resolve();

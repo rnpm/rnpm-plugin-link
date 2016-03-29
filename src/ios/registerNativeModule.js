@@ -11,6 +11,7 @@ const createGroup = require('./createGroup');
 const hasLibraryImported = require('./hasLibraryImported');
 const addFileToProject = require('./addFileToProject');
 const addProjectToLibraries = require('./addProjectToLibraries');
+const addSharedLibraries = require('./addSharedLibraries');
 const isEmpty = require('../isEmpty');
 
 /**
@@ -51,6 +52,8 @@ module.exports = function registerNativeModuleIOS(dependencyConfig, projectConfi
       target: project.getFirstTarget().uuid,
     });
   });
+
+  addSharedLibraries(project, dependencyConfig.sharedLibraries);
 
   const headers = getHeadersInFolder(dependencyConfig.folder);
   if (!isEmpty(headers)) {
