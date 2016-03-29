@@ -7,7 +7,9 @@ const unregisterDependencyIOS = require('./ios/unregisterNativeModule');
 const unlinkAssetsAndroid = require('./android/unlinkAssets');
 const unlinkAssetsIOS = require('./ios/unlinkAssets');
 const getDependencyConfig = require('./getDependencyConfig');
-const _ = require('lodash');
+const difference = require('lodash').difference;
+const isEmpty = require('lodash').isEmpty;
+const flatten = require('lodash').flatten;
 
 log.heading = 'rnpm-link';
 
@@ -67,12 +69,12 @@ module.exports = function unlink(config, args) {
     }
   }
 
-  const assets = _.difference(
+  const assets = difference(
     dependency.assets,
-    _.flatten(allDependencies, d => d.assets)
+    flatten(allDependencies, d => d.assets)
   );
 
-  if (_.isEmpty(assets)) {
+  if (isEmpty(assets)) {
     return Promise.resolve();
   }
 
