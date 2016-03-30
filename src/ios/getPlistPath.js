@@ -12,4 +12,4 @@ module.exports = function getPlistPath(project, sourceDir) {
     sourceDir,
     plistFile.replace(/"/g, '').replace('$(SRCROOT)', '')
   );
-}
+};
