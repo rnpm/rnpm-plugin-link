@@ -12,13 +12,18 @@ describe('ios::getGroup', () => {
 
   it('should return a top-level group', () => {
     const group = getGroup(project, 'Libraries');
-    expect(group.children.length > 0).to.be.true;
+    expect(group.children.length > 0).to.be.true; // our test top-level Libraries has children
     expect(group.name).to.equals('Libraries');
   });
 
   it('should return nested group when specified', () => {
     const group = getGroup(project, 'NestedGroup/Libraries');
-    expect(group.children.length).to.equals(0);
+    expect(group.children.length).to.equals(0); // our test nested Libraries is empty
     expect(group.name).to.equals('Libraries');
+  });
+
+  it('should return null when no group found', () => {
+    const group = getGroup(project, 'I-Dont-Exist');
+    expect(group).to.be.null;
   });
 });
