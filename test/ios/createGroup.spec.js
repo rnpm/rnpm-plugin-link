@@ -37,11 +37,15 @@ describe('ios::createGroup', () => {
   });
 
   it('should-not create already created groups', () => {
-    const createdGroup = createGroup(project, 'Libraries/NewNestedGroup').group;
+    const createdGroup = createGroup(project, 'Libraries/NewNestedGroup');
+    const outerGroup = getGroup(project, 'Libraries');
     const mainGroup = getGroup(project);
 
     expect(
       mainGroup.children.filter(group => group.comment === 'Libraries').length
     ).to.equals(1);
+    expect(
+      last(outerGroup.children).comment
+    ).to.equals(createdGroup.name);
   });
 });
