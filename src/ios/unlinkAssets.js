@@ -5,6 +5,7 @@ const log = require('npmlog');
 const plistParser = require('plist');
 const groupFilesByType = require('../groupFilesByType');
 const getPlist = require('./getPlist');
+const getPlistPath = require('./getPlistPath');
 const difference = require('lodash').difference;
 
 /**
@@ -47,7 +48,7 @@ module.exports = function unlinkAssetsIOS(files, projectConfig) {
   );
 
   fs.writeFileSync(
-    plistPath,
+    getPlistPath(project, projectConfig.sourceDir),
     plistParser.build(plist)
   );
 };

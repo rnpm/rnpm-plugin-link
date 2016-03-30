@@ -1,6 +1,5 @@
-const getBuildProperty = require('./getBuildProperty');
 const plistParser = require('plist');
-const path = require('path');
+const getPlistPath = require('./getPlistPath');
 const fs = require('fs');
 
 /**
@@ -8,19 +7,10 @@ const fs = require('fs');
  *
  * Returns `null` if INFOPLIST_FILE is not specified.
  */
-module.exports = function getPlistPath(project, sourceDir) {
-  const plistFile = getBuildProperty(project, 'INFOPLIST_FILE');
+module.exports = function getPlist(project, sourceDir) {
+  const plistPath = getPlistPath(project, sourceDir);
 
-  if (!plistFile) {
-    return null;
-  }
-
-  const plistPath = path.join(
-    sourceDir,
-    plistFile.replace(/"/g, '').replace('$(SRCROOT)', '')
-  );
-
-  if (!fs.existsSync(plistPath)) {
+  if (!plistPath || !fs.existsSync(plistPath)) {
     return null;
   }
 
