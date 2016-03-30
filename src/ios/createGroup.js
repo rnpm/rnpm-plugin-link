@@ -3,9 +3,8 @@ const getGroup = require('./getGroup');
 const hasGroup = (pbxGroup, name) => pbxGroup.children.find(group => group.comment === name);
 
 /**
- * Given project and name of the group, creates a new top-level group,
- * that is then - added to `mainGroup` so that it's visible as a top-level
- * folder in your Xcode sidebar
+ * Given project and path of the group, it deeply creates a given group
+ * making all outer groups if neccessary
  *
  * Returns newly created group
  */
