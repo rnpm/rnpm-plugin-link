@@ -13,6 +13,7 @@ const addFileToProject = require('./addFileToProject');
 const addProjectToLibraries = require('./addProjectToLibraries');
 const addSharedLibraries = require('./addSharedLibraries');
 const isEmpty = require('lodash').isEmpty;
+const getGroup = require('./getGroup');
 
 /**
  * Register native module IOS adds given dependency to project by adding
@@ -25,10 +26,10 @@ module.exports = function registerNativeModuleIOS(dependencyConfig, projectConfi
   const project = xcode.project(projectConfig.pbxprojPath).parseSync();
   const dependencyProject = xcode.project(dependencyConfig.pbxprojPath).parseSync();
 
-  var libraries = project.pbxGroupByName(projectConfig.libraryFolder);
+  var libraries = getGroup(project, projectConfig.libraryFolder);
 
   if (!libraries) {
-    libraries = createGroup(project, projectConfig.libraryFolder).group;
+    libraries = createGroup(project, projectConfig.libraryFolder);
 
     log.warn(
       'ERRGROUP',

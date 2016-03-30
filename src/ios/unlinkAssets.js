@@ -4,7 +4,6 @@ const xcode = require('xcode');
 const log = require('npmlog');
 const plistParser = require('plist');
 const groupFilesByType = require('../groupFilesByType');
-const createGroup = require('./createGroup');
 const getPlist = require('./getPlist');
 const difference = require('lodash').difference;
 

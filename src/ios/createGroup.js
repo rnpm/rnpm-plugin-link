@@ -1,27 +1,27 @@
-const getFirstProject = (project) => project.getFirstProject().firstProject;
+const getGroup = require('./getGroup');
+
+const hasGroup = (pbxGroup, name) => pbxGroup.children.find(group => group.comment === name);
 
 /**
- * Given project and name of the group, creates a new top-level group,
- * that is then - added to `mainGroup` so that it's visible as a top-level
- * folder in your Xcode sidebar
+ * Given project and path of the group, it deeply creates a given group
+ * making all outer groups if neccessary
  *
  * Returns newly created group
  */
-module.exports = function createGroup(project, name) {
-  const uuid = project.pbxCreateGroup(name, '""');
+module.exports = function createGroup(project, path) {
+  return path.split('/').reduce(
+    (group, name) => {
+      if (!hasGroup(group, name)) {
+        const uuid = project.pbxCreateGroup(name, '""');
 
-  const firstProject = getFirstProject(project);
+        group.children.push({
+          value: uuid,
+          comment: name,
+        });
+      }
 
-  project
-    .getPBXGroupByKey(firstProject.mainGroup)
-    .children
-    .push({
-      value: uuid,
-      comment: name,
-    });
-
-  return {
-    group: project.pbxGroupByName(name),
-    uuid,
-  };
+      return project.pbxGroupByName(name);
+    },
+    getGroup(project)
+  );
 };

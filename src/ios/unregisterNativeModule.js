@@ -12,6 +12,7 @@ const removeProjectFromLibraries = require('./removeProjectFromLibraries');
 const removeFromStaticLibraries = require('./removeFromStaticLibraries');
 const removeFromHeaderSearchPaths = require('./removeFromHeaderSearchPaths');
 const removeSharedLibraries = require('./addSharedLibraries');
+const getGroup = require('./getGroup');
 
 /**
  * Unregister native module IOS
@@ -22,7 +23,7 @@ module.exports = function unregisterNativeModule(dependencyConfig, projectConfig
   const project = xcode.project(projectConfig.pbxprojPath).parseSync();
   const dependencyProject = xcode.project(dependencyConfig.pbxprojPath).parseSync();
 
-  const libraries = project.pbxGroupByName(projectConfig.libraryFolder);
+  const libraries = getGroup(project, projectConfig.libraryFolder);
   if (!libraries || !hasLibraryImported(libraries, dependencyConfig.projectName)) {
     return false;
   }
