@@ -1,6 +1,6 @@
 const readFile = require('./fs').readFile;
 const writeFile = require('./fs').writeFile;
-const compose = require('lodash').flowright;
+const compose = require('lodash').flowRight;
 const getReactVersion = require('../getReactNativeVersion');
 const getPrefix = require('./getPrefix');
 
@@ -9,7 +9,6 @@ const applyPatch = (filePath, patch) =>
 
 module.exports = function registerNativeAndroidModule(name, dependencyConfig, projectConfig) {
   const prefix = getPrefix(getReactVersion(projectConfig.folder));
-
   const makeSettingsPatch = require(`./patches/makeSettingsPatch`);
   const makeBuildPatch = require(`./patches/makeBuildPatch`);
   const makeMainActivityPatch = require(`./${prefix}/makeMainActivityPatch`);
