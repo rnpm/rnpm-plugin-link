@@ -27,4 +27,11 @@ describe('ios::createGroup', () => {
     ).to.equals(createdGroup.uuid);
   });
 
+  it.skip('should create a nested group with given path', () => {
+    const createdGroup = createGroup(project, 'NewGroup/NewNestedGroup').group;
+  });
+
+  it.skip('should-not create already created groups', () => {
+    const createdGroup = createGroup(project, 'Libraries/NewNestedGroup').group;
+  });
 });
