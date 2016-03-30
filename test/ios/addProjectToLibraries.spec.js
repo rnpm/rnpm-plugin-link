@@ -3,7 +3,7 @@ const expect = chai.expect;
 const xcode = require('xcode');
 const PbxFile = require('xcode/lib/pbxFile');
 const addProjectToLibraries = require('../../src/ios/addProjectToLibraries');
-const lastItem = require('../../src/lastItem');
+const last = require('lodash').last;
 
 const project = xcode.project('test/fixtures/project.pbxproj');
 
@@ -19,7 +19,7 @@ describe('ios::addProjectToLibraries', () => {
 
     addProjectToLibraries(libraries, file);
 
-    const child = lastItem(libraries.children);
+    const child = last(libraries.children);
 
     expect(child).to.have.keys(['value', 'comment']);
     expect(child.comment).to.equals(file.basename);

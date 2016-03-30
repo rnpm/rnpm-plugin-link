@@ -11,11 +11,7 @@ const groupFilesByType = require('../groupFilesByType');
 module.exports = function copyAssetsAndroid(files, targetPath) {
   const assets = groupFilesByType(files);
 
-  (assets.font || []).forEach(asset => {
-    const fileName = path.basename(asset);
-    fs.copySync(
-      asset,
-      path.join(targetPath, 'fonts', fileName)
-    );
-  });
+  (assets.font || []).forEach(asset =>
+    fs.copySync(asset, path.join(targetPath, 'fonts', path.basename(asset)))
+  );
 };

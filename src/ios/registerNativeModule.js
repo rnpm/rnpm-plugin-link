@@ -12,7 +12,7 @@ const hasLibraryImported = require('./hasLibraryImported');
 const addFileToProject = require('./addFileToProject');
 const addProjectToLibraries = require('./addProjectToLibraries');
 const addSharedLibraries = require('./addSharedLibraries');
-const isEmpty = require('../isEmpty');
+const isEmpty = require('lodash').isEmpty;
 
 /**
  * Register native module IOS adds given dependency to project by adding

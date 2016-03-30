@@ -1,6 +1,6 @@
 const readFile = require('./fs').readFile;
 const writeFile = require('./fs').writeFile;
-const compose = require('lodash.flowright');
+const compose = require('lodash').flowright;
 const getReactVersion = require('../getReactNativeVersion');
 const getPrefix = require('./getPrefix');
 

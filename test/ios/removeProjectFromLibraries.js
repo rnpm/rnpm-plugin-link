@@ -4,7 +4,7 @@ const xcode = require('xcode');
 const PbxFile = require('xcode/lib/pbxFile');
 const addProjectToLibraries = require('../../src/ios/addProjectToLibraries');
 const removeProjectFromLibraries = require('../../src/ios/removeProjectFromLibraries');
-const lastItem = require('../../src/lastItem');
+const last = require('lodash').last;
 
 const project = xcode.project('test/fixtures/project.pbxproj');
 
@@ -25,7 +25,7 @@ describe('ios::removeProjectFromLibraries', () => {
 
     removeProjectFromLibraries(libraries, file);
 
-    const child = lastItem(libraries.children);
+    const child = last(libraries.children);
 
     expect(child.comment).to.not.equals(file.basename);
   });

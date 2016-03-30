@@ -1,6 +1,6 @@
 const path = require('path');
-const union = require('../union');
-const lastItem = require('../lastItem');
+const union = require('lodash').union;
+const last = require('lodash').last;
 
 /**
  * Given an array of directories, it returns the one that contains
@@ -18,7 +18,7 @@ const getOuterDirectory = (directories) =>
     const topMostFolders = topDir.split(path.sep);
 
     if (currentFolders.length === topMostFolders.length
-      && lastItem(currentFolders) !== lastItem(topMostFolders)) {
+      && last(currentFolders) !== last(topMostFolders)) {
       return currentFolders.slice(0, -1).join(path.sep);
     }
 

@@ -4,7 +4,7 @@ const fs = require('fs');
 
 const getProducts = require('./getProducts');
 const getHeadersInFolder = require('./getHeadersInFolder');
-const isEmpty = require('../isEmpty');
+const isEmpty = require('lodash').isEmpty;
 const getHeaderSearchPath = require('./getHeaderSearchPath');
 const hasLibraryImported = require('./hasLibraryImported');
 const removeFileFromProject = require('./removeFileFromProject');
