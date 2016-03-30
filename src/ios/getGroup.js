@@ -7,14 +7,19 @@ const findGroup = (group, name) => group.children.find(group => group.comment ==
  *
  * Unlike node-xcode `pbxGroupByName` - it does not return `first-matching`
  * group if multiple groups with the same name exist
+ *
+ * If path is not provided, it returns top-level group
  */
 module.exports = function getGroup(project, path) {
   const firstProject = getFirstProject(project);
-  const names = path.split('/');
 
   var group = project.getPBXGroupByKey(firstProject.mainGroup);
 
-  for (var name of names) {
+  if (!path) {
+    return group;
+  }
+
+  for (var name of path.split('/')) {
     var foundGroup = findGroup(group, name);
 
     if (foundGroup) {

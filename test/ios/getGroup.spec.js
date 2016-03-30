@@ -26,4 +26,11 @@ describe('ios::getGroup', () => {
     const group = getGroup(project, 'I-Dont-Exist');
     expect(group).to.be.null;
   });
+
+  it('should return top-level group when name not specified', () => {
+    const mainGroupId = project.getFirstProject().firstProject.mainGroup;
+    const mainGroup = project.getPBXGroupByKey(mainGroupId);
+    const group = getGroup(project);
+    expect(group).to.equals(mainGroup);
+  });
 });

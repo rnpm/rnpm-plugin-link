@@ -29,7 +29,7 @@ module.exports = function registerNativeModuleIOS(dependencyConfig, projectConfi
   var libraries = getGroup(project, projectConfig.libraryFolder);
 
   if (!libraries) {
-    libraries = createGroup(project, projectConfig.libraryFolder).group;
+    libraries = createGroup(project, projectConfig.libraryFolder);
 
     log.warn(
       'ERRGROUP',
