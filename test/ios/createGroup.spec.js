@@ -44,8 +44,6 @@ describe('ios::createGroup', () => {
     expect(
       mainGroup.children.filter(group => group.comment === 'Libraries').length
     ).to.equals(1);
-    expect(
-      last(outerGroup.children).comment
-    ).to.equals(createdGroup.name);
+    expect(last(outerGroup.children).comment).to.equals(createdGroup.name);
   });
 });
