@@ -7,6 +7,9 @@ module.exports = function makeMainActivityPatch(config) {
   const importPattern = 'import com.facebook.react.ReactActivity;';
   const packagePattern = 'new MainReactPackage()';
 
+  const packageInstance = config.packageInstance
+    .replace(/\$\{(\w+)\}/g, (pattern, paramName) => config.params[paramName]);
+
   /**
    * Make a MainActivity.java program patcher
    * @param  {String}   importPath Import path, e.g. com.oblador.vectoricons.VectorIconsPackage;
@@ -23,7 +26,7 @@ module.exports = function makeMainActivityPatch(config) {
     return append(
       patched,
       packagePattern,
-      addPackagePatch(config)
+      addPackagePatch({packageInstance})
     );
   };
 };
