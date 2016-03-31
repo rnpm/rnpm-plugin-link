@@ -8,7 +8,7 @@ module.exports = function getPlistPath(project, sourceDir) {
     return null;
   }
 
-  const plistPath = path.join(
+  return path.join(
     sourceDir,
     plistFile.replace(/"/g, '').replace('$(SRCROOT)', '')
   );
