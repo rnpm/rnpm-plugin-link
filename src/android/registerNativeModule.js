@@ -24,7 +24,7 @@ module.exports = function registerNativeAndroidModule(name, dependencyConfig, pr
   );
 
   const performMainActivityPatch = applyPatch(
-    mainActivityPath,
+    projectConfig.mainActivityPath,
     makeMainActivityPatch(dependencyConfig)
   );
 
