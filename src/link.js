@@ -100,7 +100,7 @@ module.exports = function link(config, args) {
     packageName ? [packageName] : getProjectDependencies()
   );
 
-  Promise.all(
+  return Promise.all(
     dependencies.map(dependency => promiseWaterfall([
       () => pollParams(dependency.config.params),
       (params) => new Promise((res, rej) => {
