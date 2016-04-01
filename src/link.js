@@ -102,7 +102,7 @@ module.exports = function link(config, args) {
 
   Promise.all(
     dependencies.map(dependency => promiseWaterfall([
-      () => pollParams(dependencies.shift().config.params),
+      () => pollParams(dependency.config.params),
       (params) => new Promise((res, rej) => {
         dependency.config.params = params;
         res();
