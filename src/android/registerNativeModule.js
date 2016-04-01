@@ -17,7 +17,8 @@ module.exports = function registerNativeAndroidModule(name, dependencyConfig, pr
     const makeBuildPatch = require(`./patches/makeBuildPatch`);
     const makeMainActivityPatch = require(`./${prefix}/makeMainActivityPatch`);
   } catch (e) {
-    log.error(e + '.\nPlease file an issue here: ' + pkg.bugs.url);
+    log.error(e + '.\nIt seems somethins went wrong while patching ' +
+      'Android modules.\nPlease file an issue here: ' + pkg.bugs.url);
   }
 
   const performSettingsGradlePatch = applyPatch(
