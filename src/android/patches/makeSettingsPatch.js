@@ -1,9 +1,9 @@
 const path = require('path');
 
-module.exports = function makeSettingsPatch(name, dependencyConfig, projectConfig) {
-  const relative = path.relative(
+module.exports = function makeSettingsPatch(name, androidConfig, params, projectConfig) {
+  const relativeSourceDir = path.relative(
     path.dirname(projectConfig.settingsGradlePath),
-    dependencyConfig.sourceDir
+    androidConfig.sourceDir
   );
 
   /*
@@ -11,7 +11,9 @@ module.exports = function makeSettingsPatch(name, dependencyConfig, projectConfi
    * Backslashes is the escape character and will result in an invalid path in settings.gradle
    * https://github.com/rnpm/rnpm/issues/113
    */
-  const relativePlatform = process.platform === 'win32' ? relative.replace(/\\/g, '/') : relative;
+  const projectDir = process.platform === 'win32'
+    ? relativeSourceDir.replace(/\\/g, '/')
+    : relativeSourceDir;
 
   /**
    * Replace pattern by patch in the passed content
@@ -21,7 +23,7 @@ module.exports = function makeSettingsPatch(name, dependencyConfig, projectConfi
   return function applySettingsPatch(content) {
     const patch = `include ':${name}'\n` +
       `project(':${name}').projectDir = ` +
-      `new File(rootProject.projectDir, '${relativePlatform}')`;
+      `new File(rootProject.projectDir, '${projectDir}')`;
 
     return `${content.trim()}\n${patch}\n`;
   };

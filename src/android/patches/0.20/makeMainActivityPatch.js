@@ -3,12 +3,12 @@ const addPackagePatch = require('./addPackagePatch');
 const append = (scope, pattern, patch) =>
   scope.replace(pattern, `${pattern}${patch}`);
 
-module.exports = function makeMainActivityPatch(config) {
+module.exports = function makeMainActivityPatch(androidConfig, params) {
   const importPattern = 'import com.facebook.react.ReactActivity;';
   const packagePattern = 'new MainReactPackage()';
 
-  const packageInstance = config.packageInstance
-    .replace(/\$\{(\w+)\}/g, (pattern, paramName) => config.params[paramName]);
+  const packageInstance = androidConfig.packageInstance
+    .replace(/\$\{(\w+)\}/g, (pattern, paramName) => `"${params[paramName]}"`);
 
   /**
    * Make a MainActivity.java program patcher
@@ -20,7 +20,7 @@ module.exports = function makeMainActivityPatch(config) {
     const patched = append(
       content,
       importPattern,
-      '\n' + config.packageImportPath
+      '\n' + androidConfig.packageImportPath
     );
 
     return append(
