@@ -22,12 +22,12 @@ const patchedSettingsGradle = fs.readFileSync(
 describe('makeSettingsPatch', () => {
   it('should build a patch function', () => {
     expect(
-      makeSettingsPatch(name, dependencyConfig, projectConfig)
+      makeSettingsPatch(name, dependencyConfig, {}, projectConfig)
     ).to.be.a('function');
   });
 
   it('should make a correct patch', () => {
-    const patch = makeSettingsPatch(name, dependencyConfig, projectConfig);
+    const patch = makeSettingsPatch(name, dependencyConfig, {}, projectConfig);
     expect(patch(settingsGradle)).to.be.equal(patchedSettingsGradle);
   });
 });
