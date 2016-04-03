@@ -23,7 +23,7 @@ const promisify = (func) => () => new Promise((resolve, reject) =>
 function promiseWaterfall(tasks) {
   return tasks.reduce(
     (prevTaskPromise, task) => prevTaskPromise.then(task),
-    new Promise((r, e) => r())
+    Promise.resolve()
   );
 }
 
@@ -100,6 +100,11 @@ module.exports = function link(config, args) {
     packageName ? [packageName] : getProjectDependencies()
   );
 
+  const assets = dedupeAssets(dependencies.reduce(
+    (assets, dependency) => assets.concat(dependency.config.assets),
+    project.assets
+  ));
+
   return Promise.all(
     dependencies.map(dependency => promiseWaterfall([
       () => pollParams(dependency.config.params),
@@ -111,12 +116,5 @@ module.exports = function link(config, args) {
       () => linkDependency(project, dependency),
       () => promisify(dependency.config.commands.prelink || commandStub),
     ]))
-  ).then(() => {
-    const assets = dedupeAssets(dependencies.reduce(
-      (assets, dependency) => assets.concat(dependency.config.assets),
-      project.assets
-    ));
-
-    linkAssets(project, assets);
-  });
+  ).then(() => linkAssets(project, assets));
 };
