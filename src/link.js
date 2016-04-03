@@ -28,38 +28,34 @@ function promiseWaterfall(tasks) {
 }
 
 const linkDependency = (project, dependency) => {
-  return new Promise((resolve, reject) => {
-    if (project.android && dependency.config.android) {
-      log.info(`Linking ${dependency.name} android dependency`);
+  if (project.android && dependency.config.android) {
+    log.info(`Linking ${dependency.name} android dependency`);
 
-      const didLinkAndroid = registerDependencyAndroid(
-        dependency.name,
-        dependency.config.android,
-        dependency.config.params,
-        project.android
-      );
+    const didLinkAndroid = registerDependencyAndroid(
+      dependency.name,
+      dependency.config.android,
+      dependency.config.params,
+      project.android
+    );
 
-      if (didLinkAndroid) {
-        log.info(`Android module ${dependency.name} has been successfully linked`);
-      } else {
-        log.info(`Android module ${dependency.name} is already linked`);
-      }
+    if (didLinkAndroid) {
+      log.info(`Android module ${dependency.name} has been successfully linked`);
+    } else {
+      log.info(`Android module ${dependency.name} is already linked`);
     }
+  }
 
-    if (project.ios && dependency.config.ios) {
-      log.info(`Linking ${dependency.name} ios dependency`);
+  if (project.ios && dependency.config.ios) {
+    log.info(`Linking ${dependency.name} ios dependency`);
 
-      const didLinkIOS = registerDependencyIOS(dependency.config.ios, project.ios);
+    const didLinkIOS = registerDependencyIOS(dependency.config.ios, project.ios);
 
-      if (didLinkIOS) {
-        log.info(`iOS module ${dependency.name} has been successfully linked`);
-      } else {
-        log.info(`iOS module ${dependency.name} is already linked`);
-      }
+    if (didLinkIOS) {
+      log.info(`iOS module ${dependency.name} has been successfully linked`);
+    } else {
+      log.info(`iOS module ${dependency.name} is already linked`);
     }
-
-    resolve();
-  });
+  }
 };
 
 const linkAssets = (project, assets) => {
@@ -108,10 +104,7 @@ module.exports = function link(config, args) {
   return Promise.all(
     dependencies.map(dependency => promiseWaterfall([
       () => pollParams(dependency.config.params),
-      (params) => new Promise((res, rej) => {
-        dependency.config.params = params;
-        res();
-      }),
+      (params) => dependency.config.params = params,
       () => promisify(dependency.config.commands.postlink || commandStub),
       () => linkDependency(project, dependency),
       () => promisify(dependency.config.commands.prelink || commandStub),
