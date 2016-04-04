@@ -22,7 +22,7 @@ module.exports = function headerSearchPathIter(project, func) {
     .forEach(ref => {
       const buildSettings = config[ref].buildSettings;
       const shouldVisitBuildSettings = (
-          buildSettings.HEADER_SEARCH_PATHS && buildSettings.HEADER_SEARCH_PATHS.constructor === Array ?
+          Array.isArray(buildSettings.HEADER_SEARCH_PATHS) ?
             buildSettings.HEADER_SEARCH_PATHS :
             []
         )
