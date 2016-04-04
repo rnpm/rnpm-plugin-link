@@ -7,8 +7,10 @@ module.exports = function makeMainActivityPatch(androidConfig, params) {
   const importPattern = 'import com.facebook.react.ReactActivity;';
   const packagePattern = 'new MainReactPackage()';
 
-  const packageInstance = androidConfig.packageInstance
-    .replace(/\$\{(\w+)\}/g, (pattern, paramName) => `"${params[paramName]}"`);
+  const packageInstance = androidConfig.packageInstance.replace(
+    /\$\{(\w+)\}/g,
+    (pattern, paramName) => params[paramName] ? `"${params[paramName]}"` : null
+  );
 
   /**
    * Make a MainActivity.java program patcher
