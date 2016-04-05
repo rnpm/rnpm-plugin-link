@@ -1,5 +1,17 @@
 const PbxFile = require('xcode/lib/pbxFile');
 
+const removeContainerProxy = (project, file) => {
+  const section = project.hash.project.objects.PBXContainerItemProxy;
+
+  for (var key of Object.keys(section)) {
+    if (section[key].containerPortal_comment === file.basename) {
+      delete section[key];
+    }
+  }
+
+  return;
+};
+
 /**
  * Given xcodeproj and filePath, it creates new file
  * from path provided and removes it. That operation is required since
@@ -10,5 +22,7 @@ const PbxFile = require('xcode/lib/pbxFile');
  * Returns removed file (that one will have UUID)
  */
 module.exports = function removeFileFromProject(project, filePath) {
-  return project.removeFromPbxFileReferenceSection(new PbxFile(filePath));
+  const file = project.removeFromPbxFileReferenceSection(new PbxFile(filePath));
+  removeContainerProxy(project, file);
+  return file;
 };
