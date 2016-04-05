@@ -1,5 +1,3 @@
-/* eslint no-loop-func:0 */
-
 module.exports = function removeFromProjectReferences(project, file) {
   const firstProject = project.getFirstProject().firstProject;
 
