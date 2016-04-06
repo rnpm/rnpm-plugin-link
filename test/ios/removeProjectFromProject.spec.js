@@ -26,7 +26,7 @@ describe('ios::addFileToProject', () => {
 
   it.skip('should remove file from PBXContainerProxy', () => {
     // todo(mike): add in .xcodeproj after Xcode modifications so we can test extra
-    // removals later.  
+    // removals later. 
   });
 
 });
