@@ -21,6 +21,6 @@ module.exports = function removeProjectFromProject(project, filePath) {
   }
 
   removeFromPbxItemContainerProxySection(project, file);
-  
+
   return file;
 };
