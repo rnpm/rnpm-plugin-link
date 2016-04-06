@@ -7,7 +7,7 @@ const getPrefix = require('./getPrefix');
 const applyPatch = (filePath, patch) =>
   compose(writeFile(filePath), patch, readFile(filePath));
 
-module.exports = function registerNativeAndroidModule(name, dependencyConfig, projectConfig) {
+module.exports = function registerNativeAndroidModule(name, androidConfig, params, projectConfig) {
   const prefix = getPrefix(getReactVersion(projectConfig.folder));
   const makeSettingsPatch = require(`./patches/makeSettingsPatch`);
   const makeBuildPatch = require(`./patches/makeBuildPatch`);
@@ -25,7 +25,7 @@ module.exports = function registerNativeAndroidModule(name, dependencyConfig, pr
 
   const performMainActivityPatch = applyPatch(
     projectConfig.mainActivityPath,
-    makeMainActivityPatch(dependencyConfig)
+    makeMainActivityPatch(androidConfig, params)
   );
 
   /**

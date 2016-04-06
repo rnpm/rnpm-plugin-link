@@ -9,6 +9,7 @@ const copyAssetsAndroid = require('./android/copyAssets');
 const copyAssetsIOS = require('./ios/copyAssets');
 const getProjectDependencies = require('./getProjectDependencies');
 const getDependencyConfig = require('./getDependencyConfig');
+const pollParams = require('./pollParams');
 
 log.heading = 'rnpm-link';
 
@@ -19,6 +20,13 @@ const promisify = (func) => () => new Promise((resolve, reject) =>
   func((err, res) => err ? reject(err) : resolve(res))
 );
 
+function promiseWaterfall(tasks) {
+  return tasks.reduce(
+    (prevTaskPromise, task) => prevTaskPromise.then(task),
+    Promise.resolve()
+  );
+}
+
 const linkDependency = (project, dependency) => {
   if (project.android && dependency.config.android) {
     log.info(`Linking ${dependency.name} android dependency`);
@@ -26,6 +34,7 @@ const linkDependency = (project, dependency) => {
     const didLinkAndroid = registerDependencyAndroid(
       dependency.name,
       dependency.config.android,
+      dependency.config.params,
       project.android
     );
 
@@ -73,7 +82,6 @@ const linkAssets = (project, assets) => {
  * If optional argument [packageName] is provided, it's the only one that's checked
  */
 module.exports = function link(config, args) {
-
   try {
     const project = config.getProjectConfig();
   } catch (err) {
@@ -88,17 +96,18 @@ module.exports = function link(config, args) {
     packageName ? [packageName] : getProjectDependencies()
   );
 
-  const tasks = Promise.all(dependencies.map(dependency => {
-    const pre = promisify(dependency.config.commands.prelink || commandStub);
-    const post = promisify(dependency.config.commands.postlink || commandStub);
-
-    return pre().then(() => linkDependency(project, dependency)).then(post);
-  }));
-
   const assets = dedupeAssets(dependencies.reduce(
     (assets, dependency) => assets.concat(dependency.config.assets),
     project.assets
   ));
 
-  return tasks.then(() => linkAssets(project, assets));
+  return Promise.all(
+    dependencies.map(dependency => promiseWaterfall([
+      () => pollParams(dependency.config.params),
+      (params) => dependency.config.params = params,
+      () => promisify(dependency.config.commands.postlink || commandStub),
+      () => linkDependency(project, dependency),
+      () => promisify(dependency.config.commands.prelink || commandStub),
+    ]))
+  ).then(() => linkAssets(project, assets));
 };
