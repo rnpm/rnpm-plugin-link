@@ -15,7 +15,6 @@ module.exports = function removeFromStaticLibraries(project, path, opts) {
   project.removeFromPbxBuildFileSection(file);
   project.removeFromPbxFrameworksBuildPhase(file);
   project.removeFromLibrarySearchPaths(file);
-  project.removeFromProductsPbxGroup(file);  // @todo this does not work but it should
   removeFromPbxReferenceProxySection(project, file);
 
   return file;

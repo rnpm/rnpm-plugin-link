@@ -1,6 +1,7 @@
 const PbxFile = require('xcode/lib/pbxFile');
 const removeFromPbxItemContainerProxySection = require('./removeFromPbxItemContainerProxySection');
 const removeFromProjectReferences = require('./removeFromProjectReferences');
+const removeProductGroup = require('./removeProductGroup');
 
 /**
  * Given xcodeproj and filePath, it creates new file
@@ -13,7 +14,13 @@ const removeFromProjectReferences = require('./removeFromProjectReferences');
  */
 module.exports = function removeFileFromProject(project, filePath) {
   const file = project.removeFromPbxFileReferenceSection(new PbxFile(filePath));
+  const projectRef = removeFromProjectReferences(project, file);
+
+  if (projectRef) {
+    removeProductGroup(project, projectRef.ProductGroup);
+  }
+
   removeFromPbxItemContainerProxySection(project, file);
-  removeFromProjectReferences(project, file);
+
   return file;
 };
