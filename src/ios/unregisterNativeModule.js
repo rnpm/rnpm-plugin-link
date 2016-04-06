@@ -7,7 +7,7 @@ const getHeadersInFolder = require('./getHeadersInFolder');
 const isEmpty = require('lodash').isEmpty;
 const getHeaderSearchPath = require('./getHeaderSearchPath');
 const hasLibraryImported = require('./hasLibraryImported');
-const removeFileFromProject = require('./removeFileFromProject');
+const removeProjectFromProject = require('./removeProjectFromProject');
 const removeProjectFromLibraries = require('./removeProjectFromLibraries');
 const removeFromStaticLibraries = require('./removeFromStaticLibraries');
 const removeFromHeaderSearchPaths = require('./removeFromHeaderSearchPaths');
@@ -28,7 +28,7 @@ module.exports = function unregisterNativeModule(dependencyConfig, projectConfig
     return false;
   }
 
-  const file = removeFileFromProject(
+  const file = removeProjectFromProject(
     project,
     path.relative(projectConfig.sourceDir, dependencyConfig.projectPath)
   );
