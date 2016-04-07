@@ -105,9 +105,9 @@ module.exports = function link(config, args) {
     dependencies.map(dependency => promiseWaterfall([
       () => pollParams(dependency.config.params),
       (params) => dependency.config.params = params,
-      () => promisify(dependency.config.commands.postlink || commandStub),
-      () => linkDependency(project, dependency),
       () => promisify(dependency.config.commands.prelink || commandStub),
+      () => linkDependency(project, dependency),
+      () => promisify(dependency.config.commands.postlink || commandStub),
     ]))
   ).then(() => linkAssets(project, assets));
 };
