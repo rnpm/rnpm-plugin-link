@@ -42,5 +42,8 @@ module.exports = function registerNativeAndroidModule(name, androidConfig, param
       performBuildGradlePatch,
       performMainActivityPatch
     )();
+    return true;
+  } else {
+    return false;
   }
 };
