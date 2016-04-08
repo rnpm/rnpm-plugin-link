@@ -1,6 +1,7 @@
 const log = require('npmlog');
 const path = require('path');
 const uniq = require('lodash').uniq;
+const pkg = require('../package.json');
 
 const isEmpty = require('lodash').isEmpty;
 const registerDependencyAndroid = require('./android/registerNativeModule');
@@ -9,7 +10,6 @@ const copyAssetsAndroid = require('./android/copyAssets');
 const copyAssetsIOS = require('./ios/copyAssets');
 const getProjectDependencies = require('./getProjectDependencies');
 const getDependencyConfig = require('./getDependencyConfig');
-const pollParams = require('./pollParams');
 
 log.heading = 'rnpm-link';
 
@@ -28,34 +28,47 @@ function promiseWaterfall(tasks) {
 }
 
 const linkDependency = (project, dependency) => {
+  const tasks = [];
+
+  if (project.ios && dependency.config.ios) {
+    log.info(`Linking ${dependency.name} ios dependency`);
+    tasks.push(registerDependencyIOS(dependency.config.ios, project.ios));
+  }
+
   if (project.android && dependency.config.android) {
     log.info(`Linking ${dependency.name} android dependency`);
-
-    const didLinkAndroid = registerDependencyAndroid(
+    tasks.push(registerDependencyAndroid(
       dependency.name,
       dependency.config.android,
       dependency.config.params,
       project.android
-    );
-
-    if (didLinkAndroid) {
-      log.info(`Android module ${dependency.name} has been successfully linked`);
-    } else {
-      log.info(`Android module ${dependency.name} is already linked`);
-    }
+    ));
   }
 
-  if (project.ios && dependency.config.ios) {
-    log.info(`Linking ${dependency.name} ios dependency`);
+  return Promise.all(tasks)
+    .then(results => {
+      const didLinkAndroid = results[0];
+      const didLinkIOS = results[1];
 
-    const didLinkIOS = registerDependencyIOS(dependency.config.ios, project.ios);
+      if (didLinkAndroid) {
+        log.info(`Android module ${dependency.name} has been successfully linked`);
+      } else {
+        log.info(`Android module ${dependency.name} is already linked`);
+      }
 
-    if (didLinkIOS) {
-      log.info(`iOS module ${dependency.name} has been successfully linked`);
-    } else {
-      log.info(`iOS module ${dependency.name} is already linked`);
-    }
-  }
+      if (didLinkIOS) {
+        log.info(`iOS module ${dependency.name} has been successfully linked`);
+      } else {
+        log.info(`iOS module ${dependency.name} is already linked`);
+      }
+    })
+    .catch(err => {
+      log.error(
+        `It seems something went wrong while linking. Error: ${err.message} \n`
+        + `Please file an issue here: ${pkg.bugs.url}`
+      );
+      throw err;
+    });
 };
 
 const linkAssets = (project, assets) => {
@@ -103,8 +116,6 @@ module.exports = function link(config, args) {
 
   return Promise.all(
     dependencies.map(dependency => promiseWaterfall([
-      () => pollParams(dependency.config.params),
-      (params) => dependency.config.params = params,
       () => promisify(dependency.config.commands.prelink || commandStub),
       () => linkDependency(project, dependency),
       () => promisify(dependency.config.commands.postlink || commandStub),
