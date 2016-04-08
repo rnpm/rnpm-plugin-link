@@ -36,11 +36,15 @@ module.exports = function registerNativeAndroidModule(name, androidConfig, param
     readFile(projectConfig.buildGradlePath)
   );
 
-  if (!isInstalled(name)) {
-    compose(
-      performSettingsGradlePatch,
-      performBuildGradlePatch,
-      performMainActivityPatch
-    )();
+  if (isInstalled(name)) {
+    return false;
   }
+
+  compose(
+    performSettingsGradlePatch,
+    performBuildGradlePatch,
+    performMainActivityPatch
+  )();
+
+  return true;
 };
