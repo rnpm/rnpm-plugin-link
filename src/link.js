@@ -2,6 +2,7 @@ const log = require('npmlog');
 const path = require('path');
 const uniq = require('lodash').uniq;
 const flatten = require('lodash').flatten;
+const pkg = require('../package.json');
 
 const isEmpty = require('lodash').isEmpty;
 const registerDependencyAndroid = require('./android/registerNativeModule');
@@ -128,5 +129,11 @@ module.exports = function link(config, args) {
 
   tasks.push(() => linkAssets(project, assets));
 
-  return promiseWaterfall(tasks);
+  return promiseWaterfall(tasks).catch(err => {
+    log.error(
+      `It seems something went wrong while linking. Error: ${err.message} \n`
+      + `Please file an issue here: ${pkg.bugs.url}`
+    );
+    throw err;
+  });
 };
