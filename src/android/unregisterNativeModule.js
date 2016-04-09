@@ -4,6 +4,7 @@ const path = require('path');
 const compose = require('lodash').flowRight;
 const getReactVersion = require('../getReactNativeVersion');
 const getPrefix = require('./getPrefix');
+const isInstalled = require('./isInstalled');
 
 const cut = (scope, pattern) =>
   scope.replace(pattern, '');
@@ -60,15 +61,7 @@ module.exports = function unregisterNativeAndroidModule(name, dependencyConfig, 
     readFile(projectConfig.mainActivityPath)
   );
 
-  /**
-   * Check if module has been installed already
-   */
-  const isInstalled = compose(
-    (content) => ~content.indexOf(getAddPackagePatch(dependencyConfig)),
-    readFile(projectConfig.mainActivityPath)
-  );
-
-  if (!isInstalled(name)) {
+  if (!isInstalled(projectConfig, name)) {
     return false;
   }
 
