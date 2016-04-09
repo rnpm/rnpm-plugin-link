@@ -2,7 +2,7 @@ const xcode = require('xcode');
 const getGroup = require('./getGroup');
 const hasLibraryImported = require('./hasLibraryImported');
 
-module.exports = function isInstalled(projectConfig, projectName) {
+module.exports = function isInstalled(projectConfig, dependencyConfig) {
   const project = xcode.project(projectConfig.pbxprojPath).parseSync();
   const libraries = getGroup(project, projectConfig.libraryFolder);
 
@@ -10,5 +10,5 @@ module.exports = function isInstalled(projectConfig, projectName) {
     return false;
   }
 
-  return hasLibraryImported(libraries, projectName);
+  return hasLibraryImported(libraries, dependencyConfig.packageName);
 };

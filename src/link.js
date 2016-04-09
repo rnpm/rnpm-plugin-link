@@ -31,51 +31,49 @@ function promiseWaterfall(tasks) {
   );
 }
 
-const linkDependency = (project, dependency) => {
-  const tasks = [];
-
-  if (project.android && dependency.config.android) {
-    const isInstalledAndroid = isDependencyInstalledAndroid(
-      project.android,
-      dependency.name
-    );
-
-    if (isInstalledAndroid) {
-      log.info(`Android module ${dependency.name} is already linked`);
-    } else {
-      tasks.push(() => pollParams(dependency.config.params).then(answers => {
-        log.info(`Linking ${dependency.name} android dependency`);
-
-        registerDependencyAndroid(
-          dependency.name,
-          dependency.config.android,
-          answers,
-          project.android
-        );
-
-        log.info(`Android module ${dependency.name} has been successfully linked`);
-      }));
-    }
+const linkDependencyAndroid = (androidProject, dependency) => {
+  if (!androidProject || !dependency.config.android) {
+    return null;
   }
 
-  if (project.ios && dependency.config.ios) {
-    const isInstalledIOS = isDependencyInstalledIOS(
-      project.ios,
-      dependency.config.ios.packageName
-    );
+  const isInstalledAndroid = isDependencyInstalledAndroid(androidProject, dependency.name);
 
-    if (isInstalledIOS) {
-      log.info(`iOS module ${dependency.name} is already linked`);
-    } else {
-      tasks.push(() => {
-        log.info(`Linking ${dependency.name} ios dependency`);
-        registerDependencyIOS(dependency.config.ios, project.ios);
-        log.info(`iOS module ${dependency.name} is already linked`);
-      });
-    }
+  if (isInstalledAndroid) {
+    log.info(`Android module ${dependency.name} is already linked`);
+    return null;
   }
 
-  return promiseWaterfall(tasks);
+  return pollParams(dependency.config.params).then(answers => {
+    log.info(`Linking ${dependency.name} android dependency`);
+
+    registerDependencyAndroid(
+      dependency.name,
+      dependency.config.android,
+      answers,
+      androidProject
+    );
+
+    log.info(`Android module ${dependency.name} has been successfully linked`);
+  });
+};
+
+const linkDependencyIOS = (iOSProject, dependency) => {
+  if (!iOSProject || !dependency.config.ios) {
+    return;
+  }
+
+  const isInstalledIOS = isDependencyInstalledIOS(iOSProject, dependency.config.ios);
+
+  if (isInstalledIOS) {
+    log.info(`iOS module ${dependency.name} is already linked`);
+    return;
+  }
+
+  log.info(`Linking ${dependency.name} ios dependency`);
+
+  registerDependencyIOS(dependency.config.ios, iOSProject);
+
+  log.info(`iOS module ${dependency.name} is already linked`);
 };
 
 const linkAssets = (project, assets) => {
@@ -123,7 +121,8 @@ module.exports = function link(config, args) {
 
   const tasks = flatten(dependencies.map(dependency => [
     () => promisify(dependency.config.commands.prelink || commandStub),
-    () => linkDependency(project, dependency),
+    () => linkDependencyAndroid(project.android, dependency),
+    () => linkDependencyIOS(project.ios, dependency),
     () => promisify(dependency.config.commands.postlink || commandStub),
   ]));
 
