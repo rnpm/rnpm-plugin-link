@@ -11,6 +11,7 @@ const copyAssetsAndroid = require('./android/copyAssets');
 const copyAssetsIOS = require('./ios/copyAssets');
 const getProjectDependencies = require('./getProjectDependencies');
 const getDependencyConfig = require('./getDependencyConfig');
+const promiseWaterfall = require('./promiseWaterfall');
 
 log.heading = 'rnpm-link';
 
@@ -20,25 +21,6 @@ const dedupeAssets = (assets) => uniq(assets, asset => path.basename(asset));
 const promisify = (func) => new Promise((resolve, reject) =>
   func((err, res) => err ? reject(err) : resolve(res))
 );
-
-function promiseWaterfall(tasks) {
-  const values = [];
-
-  if (tasks.length === 0) {
-    return Promise.resolve(values);
-  }
-
-  const firstTask = tasks.shift();
-
-  return tasks.reduce(
-    (prevTaskPromise, task) => Promise.resolve(prevTaskPromise).then(prevTaskValue => {
-      values.push(prevTaskValue);
-      return task(prevTaskValue);
-    }),
-    firstTask()
-  )
-  .then(lastTaskValue => values.concat(lastTaskValue));
-}
 
 const linkDependency = (project, dependency) => {
   const tasks = [];
