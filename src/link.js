@@ -2,7 +2,6 @@ const log = require('npmlog');
 const path = require('path');
 const uniq = require('lodash').uniq;
 const flatten = require('lodash').flatten;
-const pkg = require('../package.json');
 
 const isEmpty = require('lodash').isEmpty;
 const registerDependencyAndroid = require('./android/registerNativeModule');
@@ -43,20 +42,18 @@ const linkDependency = (project, dependency) => {
     if (isInstalledAndroid) {
       log.info(`Android module ${dependency.name} is already linked`);
     } else {
-      tasks.push(() => pollParams(dependency.config.params)
-        .then(answers => {
-          log.info(`Linking ${dependency.name} android dependency`);
+      tasks.push(() => pollParams(dependency.config.params).then(answers => {
+        log.info(`Linking ${dependency.name} android dependency`);
 
-          registerDependencyAndroid(
-            dependency.name,
-            dependency.config.android,
-            answers,
-            project.android
-          );
+        registerDependencyAndroid(
+          dependency.name,
+          dependency.config.android,
+          answers,
+          project.android
+        );
 
-          log.info(`Android module ${dependency.name} has been successfully linked`);
-        })
-      );
+        log.info(`Android module ${dependency.name} has been successfully linked`);
+      }));
     }
   }
 
@@ -71,21 +68,13 @@ const linkDependency = (project, dependency) => {
     } else {
       tasks.push(() => {
         log.info(`Linking ${dependency.name} ios dependency`);
-
         registerDependencyIOS(dependency.config.ios, project.ios);
-
         log.info(`iOS module ${dependency.name} is already linked`);
       });
     }
   }
 
-  return promiseWaterfall(tasks).catch(err => {
-    log.error(
-      `It seems something went wrong while linking. Error: ${err.message} \n`
-      + `Please file an issue here: ${pkg.bugs.url}`
-    );
-    throw err;
-  });
+  return promiseWaterfall(tasks);
 };
 
 const linkAssets = (project, assets) => {
