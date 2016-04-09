@@ -70,8 +70,18 @@ describe('link', () => {
     };
 
     mock(
+      '../src/android/isInstalled.js',
+      sinon.stub().returns(false)
+    );
+
+    mock(
       '../src/android/registerNativeModule.js',
       registerNativeModule
+    );
+
+    mock(
+      '../src/ios/isInstalled.js',
+      sinon.stub().returns(false)
     );
 
     mock(
@@ -84,7 +94,7 @@ describe('link', () => {
     link(config, ['react-native-blur']).then(() => {
       expect(registerNativeModule.calledTwice).to.be.true;
       done();
-    });
+    }).catch(err => console.log(err.stack));
   });
 
   it('should run prelink and postlink commands at the appropriate times', (done) => {
@@ -95,6 +105,11 @@ describe('link', () => {
     mock(
       '../src/ios/registerNativeModule.js',
       registerNativeModule
+    );
+
+    mock(
+      '../src/ios/isInstalled.js',
+      sinon.stub().returns(false)
     );
 
     const config = {
@@ -110,7 +125,7 @@ describe('link', () => {
       expect(prelink.calledBefore(registerNativeModule)).to.be.true;
       expect(postlink.calledAfter(registerNativeModule)).to.be.true;
       done();
-    });
+    }).catch(err => console.log(err));
   });
 
   it('should copy assets from both project and dependencies projects', (done) => {

@@ -7,10 +7,13 @@ const pkg = require('../package.json');
 const isEmpty = require('lodash').isEmpty;
 const registerDependencyAndroid = require('./android/registerNativeModule');
 const registerDependencyIOS = require('./ios/registerNativeModule');
+const isDependencyInstalledAndroid = require('./android/isInstalled');
+const isDependencyInstalledIOS = require('./ios/isInstalled');
 const copyAssetsAndroid = require('./android/copyAssets');
 const copyAssetsIOS = require('./ios/copyAssets');
 const getProjectDependencies = require('./getProjectDependencies');
 const getDependencyConfig = require('./getDependencyConfig');
+const pollParams = require('./pollParams');
 
 log.heading = 'rnpm-link';
 
@@ -32,38 +35,48 @@ const linkDependency = (project, dependency) => {
   const tasks = [];
 
   if (project.android && dependency.config.android) {
-    tasks.push(() => {
-      log.info(`Linking ${dependency.name} android dependency`);
+    const isInstalledAndroid = isDependencyInstalledAndroid(
+      project.android,
+      dependency.name
+    );
 
-      const linkAndroid = registerDependencyAndroid(
-        dependency.name,
-        dependency.config.android,
-        dependency.config.params,
-        project.android
-      );
+    if (isInstalledAndroid) {
+      log.info(`Android module ${dependency.name} is already linked`);
+    } else {
+      tasks.push(() => pollParams(dependency.config.params)
+        .then(answers => {
+          log.info(`Linking ${dependency.name} android dependency`);
 
-      return linkAndroid.then(didLinkAndroid => {
-        if (didLinkAndroid) {
+          registerDependencyAndroid(
+            dependency.name,
+            dependency.config.android,
+            answers,
+            project.android
+          );
+
           log.info(`Android module ${dependency.name} has been successfully linked`);
-        } else {
-          log.info(`Android module ${dependency.name} is already linked`);
-        }
-      });
-    });
+        })
+      );
+    }
   }
 
   if (project.ios && dependency.config.ios) {
-    tasks.push(() => {
-      log.info(`Linking ${dependency.name} ios dependency`);
+    const isInstalledIOS = isDependencyInstalledIOS(
+      project.ios,
+      dependency.config.ios.packageName
+    );
 
-      const didLinkIOS = registerDependencyIOS(dependency.config.ios, project.ios);
+    if (isInstalledIOS) {
+      log.info(`iOS module ${dependency.name} is already linked`);
+    } else {
+      tasks.push(() => {
+        log.info(`Linking ${dependency.name} ios dependency`);
 
-      if (didLinkIOS) {
-        log.info(`iOS module ${dependency.name} has been successfully linked`);
-      } else {
+        registerDependencyIOS(dependency.config.ios, project.ios);
+
         log.info(`iOS module ${dependency.name} is already linked`);
-      }
-    });
+      });
+    }
   }
 
   return promiseWaterfall(tasks).catch(err => {
