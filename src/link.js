@@ -7,8 +7,8 @@ const pkg = require('../package.json');
 const isEmpty = require('lodash').isEmpty;
 const registerDependencyAndroid = require('./android/registerNativeModule');
 const registerDependencyIOS = require('./ios/registerNativeModule');
-const isDependencyInstalledAndroid = require('./android/isInstalled');
-const isDependencyInstalledIOS = require('./ios/isInstalled');
+const isInstalledAndroid = require('./android/isInstalled');
+const isInstalledIOS = require('./ios/isInstalled');
 const copyAssetsAndroid = require('./android/copyAssets');
 const copyAssetsIOS = require('./ios/copyAssets');
 const getProjectDependencies = require('./getProjectDependencies');
@@ -36,9 +36,9 @@ const linkDependencyAndroid = (androidProject, dependency) => {
     return null;
   }
 
-  const isInstalledAndroid = isDependencyInstalledAndroid(androidProject, dependency.name);
+  const isInstalled = isInstalledAndroid(androidProject, dependency.name);
 
-  if (isInstalledAndroid) {
+  if (isInstalled) {
     log.info(`Android module ${dependency.name} is already linked`);
     return null;
   }
@@ -62,9 +62,9 @@ const linkDependencyIOS = (iOSProject, dependency) => {
     return;
   }
 
-  const isInstalledIOS = isDependencyInstalledIOS(iOSProject, dependency.config.ios);
+  const isInstalled = isInstalledIOS(iOSProject, dependency.config.ios);
 
-  if (isInstalledIOS) {
+  if (isInstalled) {
     log.info(`iOS module ${dependency.name} is already linked`);
     return;
   }

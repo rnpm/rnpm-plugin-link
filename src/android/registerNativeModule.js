@@ -28,9 +28,6 @@ module.exports = function registerNativeAndroidModule(name, androidConfig, param
     makeMainActivityPatch(androidConfig, params)
   );
 
-  /**
-   * Check if module has been installed already
-   */
   compose(
     performSettingsGradlePatch,
     performBuildGradlePatch,
