@@ -8,7 +8,7 @@ const pollParams = require('../pollParams');
 const applyPatch = (filePath, patch) =>
   compose(writeFile(filePath), patch, readFile(filePath));
 
-function registerModule(name, androidConfig, params, projectConfig) {
+function registerNativeAndroidModule(name, androidConfig, params, projectConfig) {
   const prefix = getPrefix(getReactVersion(projectConfig.folder));
   const makeSettingsPatch = require(`./patches/makeSettingsPatch`);
   const makeBuildPatch = require(`./patches/makeBuildPatch`);
@@ -41,7 +41,10 @@ function registerModule(name, androidConfig, params, projectConfig) {
   return true;
 }
 
-module.exports = function registerNativeAndroidModule(name, androidConfig, params, projectConfig) {
+/**
+ * Register module (and poll for params) only if module is not yet linked.
+ */
+module.exports = function maybeRegisterAndroidModule(name, androidConfig, params, projectConfig) {
   const isInstalled = compose(
     (content) => ~content.indexOf(`:${name}`),
     readFile(projectConfig.buildGradlePath)
@@ -51,5 +54,5 @@ module.exports = function registerNativeAndroidModule(name, androidConfig, param
     return false;
   }
 
-  return pollParams(params).then(answers => registerModule(name, androidConfig, answers, projectConfig));
+  return pollParams(params).then(answers => registerNativeAndroidModule(name, androidConfig, answers, projectConfig));
 };
