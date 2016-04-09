@@ -10,5 +10,5 @@ module.exports = function isInstalled(projectConfig, dependencyConfig) {
     return false;
   }
 
-  return hasLibraryImported(libraries, dependencyConfig.packageName);
+  return hasLibraryImported(libraries, dependencyConfig.projectName);
 };
