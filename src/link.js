@@ -43,7 +43,7 @@ const linkDependencyAndroid = (androidProject, dependency) => {
     return null;
   }
 
-  return pollParams(dependency.config.params).then(answers => {
+  return pollParams(dependency.config.android.params).then(answers => {
     log.info(`Linking ${dependency.name} android dependency`);
 
     registerDependencyAndroid(
@@ -73,7 +73,7 @@ const linkDependencyIOS = (iOSProject, dependency) => {
 
   registerDependencyIOS(dependency.config.ios, iOSProject);
 
-  log.info(`iOS module ${dependency.name} is already linked`);
+  log.info(`iOS module ${dependency.name} has been successfully linked`);
 };
 
 const linkAssets = (project, assets) => {
