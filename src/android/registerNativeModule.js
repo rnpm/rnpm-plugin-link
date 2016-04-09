@@ -29,6 +29,9 @@ function registerModule(name, androidConfig, params, projectConfig) {
     makeMainActivityPatch(androidConfig, params)
   );
 
+  /**
+   * Check if module has been installed already
+   */
   compose(
     performSettingsGradlePatch,
     performBuildGradlePatch,
