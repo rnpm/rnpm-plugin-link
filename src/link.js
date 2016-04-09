@@ -1,6 +1,7 @@
 const log = require('npmlog');
 const path = require('path');
 const uniq = require('lodash').uniq;
+const flatten = require('lodash').flatten;
 const pkg = require('../package.json');
 
 const isEmpty = require('lodash').isEmpty;
@@ -22,17 +23,21 @@ const promisify = (func) => () => new Promise((resolve, reject) =>
 
 function promiseWaterfall(tasks) {
   const values = [];
+
+  if (tasks.length === 0) {
+    return Promise.resolve(values);
+  }
+
   const firstTask = tasks.shift();
 
-  return tasks
-    .reduce(
-      (prevTaskPromise, task) => Promise.resolve(prevTaskPromise).then(prevTaskValue => {
-        values.push(prevTaskValue);
-        return task(prevTaskValue);
-      }),
-      firstTask()
-    )
-    .then(lastTaskValue => values.concat(lastTaskValue));
+  return tasks.reduce(
+    (prevTaskPromise, task) => Promise.resolve(prevTaskPromise).then(prevTaskValue => {
+      values.push(prevTaskValue);
+      return task(prevTaskValue);
+    }),
+    firstTask()
+  )
+  .then(lastTaskValue => values.concat(lastTaskValue));
 }
 
 const linkDependency = (project, dependency) => {
@@ -126,11 +131,13 @@ module.exports = function link(config, args) {
     project.assets
   ));
 
-  return Promise.all(
-    dependencies.map(dependency => promiseWaterfall([
-      () => promisify(dependency.config.commands.prelink || commandStub),
-      () => linkDependency(project, dependency),
-      () => promisify(dependency.config.commands.postlink || commandStub),
-    ]))
-  ).then(() => linkAssets(project, assets));
+  const tasks = flatten(dependencies.map(dependency => [
+    () => promisify(dependency.config.commands.prelink || commandStub),
+    () => linkDependency(project, dependency),
+    () => promisify(dependency.config.commands.postlink || commandStub),
+  ]));
+
+  tasks.push(() => linkAssets(project, assets));
+
+  return promiseWaterfall(tasks);
 };
