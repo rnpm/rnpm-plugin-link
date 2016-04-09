@@ -51,7 +51,7 @@ module.exports = function maybeRegisterAndroidModule(name, androidConfig, params
   );
 
   if (isInstalled(name)) {
-    return false;
+    return Promise.resolve(false);
   }
 
   return pollParams(params).then(answers => registerNativeAndroidModule(name, androidConfig, answers, projectConfig));

@@ -11,7 +11,6 @@ const copyAssetsAndroid = require('./android/copyAssets');
 const copyAssetsIOS = require('./ios/copyAssets');
 const getProjectDependencies = require('./getProjectDependencies');
 const getDependencyConfig = require('./getDependencyConfig');
-const promiseWaterfall = require('./promiseWaterfall');
 
 log.heading = 'rnpm-link';
 
@@ -22,52 +21,58 @@ const promisify = (func) => new Promise((resolve, reject) =>
   func((err, res) => err ? reject(err) : resolve(res))
 );
 
+function promiseWaterfall(tasks) {
+  return tasks.reduce(
+    (prevTaskPromise, task) => prevTaskPromise.then(task),
+    Promise.resolve()
+  );
+}
+
 const linkDependency = (project, dependency) => {
   const tasks = [];
 
   if (project.android && dependency.config.android) {
     tasks.push(() => {
       log.info(`Linking ${dependency.name} android dependency`);
-      return registerDependencyAndroid(
+
+      const linkAndroid = registerDependencyAndroid(
         dependency.name,
         dependency.config.android,
         dependency.config.params,
         project.android
       );
+
+      return linkAndroid.then(didLinkAndroid => {
+        if (didLinkAndroid) {
+          log.info(`Android module ${dependency.name} has been successfully linked`);
+        } else {
+          log.info(`Android module ${dependency.name} is already linked`);
+        }
+      });
     });
   }
 
   if (project.ios && dependency.config.ios) {
     tasks.push(() => {
       log.info(`Linking ${dependency.name} ios dependency`);
-      return registerDependencyIOS(dependency.config.ios, project.ios);
-    });
-  }
 
-  return promiseWaterfall(tasks)
-    .then(results => {
-      const didLinkAndroid = results[0];
-      const didLinkIOS = results[1];
-
-      if (didLinkAndroid) {
-        log.info(`Android module ${dependency.name} has been successfully linked`);
-      } else {
-        log.info(`Android module ${dependency.name} is already linked`);
-      }
+      const didLinkIOS = registerDependencyIOS(dependency.config.ios, project.ios);
 
       if (didLinkIOS) {
         log.info(`iOS module ${dependency.name} has been successfully linked`);
       } else {
         log.info(`iOS module ${dependency.name} is already linked`);
       }
-    })
-    .catch(err => {
-      log.error(
-        `It seems something went wrong while linking. Error: ${err.message} \n`
-        + `Please file an issue here: ${pkg.bugs.url}`
-      );
-      throw err;
     });
+  }
+
+  return promiseWaterfall(tasks).catch(err => {
+    log.error(
+      `It seems something went wrong while linking. Error: ${err.message} \n`
+      + `Please file an issue here: ${pkg.bugs.url}`
+    );
+    throw err;
+  });
 };
 
 const linkAssets = (project, assets) => {
