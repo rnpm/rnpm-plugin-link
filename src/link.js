@@ -21,31 +21,43 @@ const promisify = (func) => () => new Promise((resolve, reject) =>
 );
 
 function promiseWaterfall(tasks) {
-  return tasks.reduce(
-    (prevTaskPromise, task) => prevTaskPromise.then(task),
-    Promise.resolve()
-  );
+  const values = [];
+  const firstTask = tasks.shift();
+
+  return tasks
+    .reduce(
+      (prevTaskPromise, task) => Promise.resolve(prevTaskPromise).then(prevTaskValue => {
+        values.push(prevTaskValue);
+        return task(prevTaskValue);
+      }),
+      firstTask()
+    )
+    .then(lastTaskValue => values.concat(lastTaskValue));
 }
 
 const linkDependency = (project, dependency) => {
   const tasks = [];
 
-  if (project.ios && dependency.config.ios) {
-    log.info(`Linking ${dependency.name} ios dependency`);
-    tasks.push(registerDependencyIOS(dependency.config.ios, project.ios));
-  }
-
   if (project.android && dependency.config.android) {
-    log.info(`Linking ${dependency.name} android dependency`);
-    tasks.push(registerDependencyAndroid(
-      dependency.name,
-      dependency.config.android,
-      dependency.config.params,
-      project.android
-    ));
+    tasks.push(() => {
+      log.info(`Linking ${dependency.name} android dependency`);
+      return registerDependencyAndroid(
+        dependency.name,
+        dependency.config.android,
+        dependency.config.params,
+        project.android
+      );
+    });
   }
 
-  return Promise.all(tasks)
+  if (project.ios && dependency.config.ios) {
+    tasks.push(() => {
+      log.info(`Linking ${dependency.name} ios dependency`);
+      return registerDependencyIOS(dependency.config.ios, project.ios);
+    });
+  }
+
+  return promiseWaterfall(tasks)
     .then(results => {
       const didLinkAndroid = results[0];
       const didLinkIOS = results[1];
