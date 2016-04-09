@@ -1,4 +1,3 @@
-
 const xcode = require('xcode');
 const getGroup = require('./getGroup');
 const hasLibraryImported = require('./hasLibraryImported');
