@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const isInstalled = require('../../src/ios/isInstalled');
 
-const iosConfig = {
+const baseProjectConfig = {
   pbxprojPath: 'project.pbxproj',
   libraryFolder: 'Libraries',
 };
@@ -20,12 +20,18 @@ describe('ios::isInstalled', () => {
 
   it('should return true when .xcodeproj in Libraries', () => {
     const dependencyConfig = { projectName: 'React.xcodeproj' };
-    expect(isInstalled(iosConfig, dependencyConfig)).to.be.true;
+    expect(isInstalled(baseProjectConfig, dependencyConfig)).to.be.true;
   });
 
   it('should return false when .xcodeproj not in Libraries', () => {
     const dependencyConfig = { projectName: 'Missing.xcodeproj' };
-    expect(isInstalled(iosConfig, dependencyConfig)).to.be.false;
+    expect(isInstalled(baseProjectConfig, dependencyConfig)).to.be.false;
+  });
+
+  it('should return false when `LibraryFolder` is missing', () => {
+    const dependencyConfig = { projectName: 'React.xcodeproj' };
+    const projectConfig = Object.assign({}, baseProjectConfig, { libraryFolder: 'Missing' });
+    expect(isInstalled(projectConfig, dependencyConfig)).to.be.false;
   });
 
   after(mock.restore);
