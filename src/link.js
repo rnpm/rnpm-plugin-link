@@ -16,7 +16,7 @@ log.heading = 'rnpm-link';
 const commandStub = (cb) => cb();
 const dedupeAssets = (assets) => uniq(assets, asset => path.basename(asset));
 
-const promisify = (func) => () => new Promise((resolve, reject) =>
+const promisify = (func) => new Promise((resolve, reject) =>
   func((err, res) => err ? reject(err) : resolve(res))
 );
 
