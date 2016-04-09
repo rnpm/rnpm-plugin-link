@@ -15,16 +15,20 @@ module.exports = function makeSettingsPatch(name, androidConfig, params, project
     ? relativeSourceDir.replace(/\\/g, '/')
     : relativeSourceDir;
 
+  const patch = `include ':${name}'\n` +
+    `project(':${name}').projectDir = ` +
+    `new File(rootProject.projectDir, '${projectDir}')`;
+
   /**
    * Replace pattern by patch in the passed content
    * @param  {String} content Content of the Settings.gradle file
    * @return {String}         Patched content of Settings.gradle
    */
-  return function applySettingsPatch(content) {
-    const patch = `include ':${name}'\n` +
-      `project(':${name}').projectDir = ` +
-      `new File(rootProject.projectDir, '${projectDir}')`;
-
+  const applySettingsPatch = (content) => {
     return `${content.trim()}\n${patch}\n`;
   };
+
+  applySettingsPatch.patch = patch;
+
+  return applySettingsPatch;
 };

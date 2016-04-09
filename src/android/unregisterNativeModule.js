@@ -4,6 +4,7 @@ const path = require('path');
 const compose = require('lodash').flowRight;
 const getReactVersion = require('../getReactNativeVersion');
 const getPrefix = require('./getPrefix');
+const makeSettingsPatch = require('./patches/makeSettingsPatch');
 const isInstalled = require('./isInstalled');
 
 const cut = (scope, pattern) =>
@@ -12,15 +13,13 @@ const cut = (scope, pattern) =>
 module.exports = function unregisterNativeAndroidModule(name, dependencyConfig, projectConfig) {
   const prefix = getPrefix(getReactVersion(projectConfig.folder));
 
+  const settingsPatch = makeSettingsPatch(name, dependencyConfig, {}, projectConfig).patch;
+
   /**
    * @param  {String} content Content of the Settings.gradle file
    * @return {String}         Patched content of Settings.gradle
    */
-  const cutModuleFromSettings = (name) => (content) =>
-    cut(content, `include ':${name}'\n` +
-      `project(':${name}').projectDir = ` +
-      `new File(rootProject.projectDir, '../node_modules/${name}/android')\n`
-    );
+  const cutModuleFromSettings = (content) => cut(content, settingsPatch);
 
   /**
    * Cut module compilation from the project build
@@ -45,7 +44,7 @@ module.exports = function unregisterNativeAndroidModule(name, dependencyConfig, 
 
   const applySettingsGradlePatch = compose(
     writeFile(projectConfig.settingsGradlePath),
-    cutModuleFromSettings(name),
+    cutModuleFromSettings,
     readFile(projectConfig.settingsGradlePath)
   );
 
