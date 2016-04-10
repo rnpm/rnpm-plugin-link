@@ -23,4 +23,15 @@ describe('promiseWaterfall', () => {
     });
   });
 
+  it('should stop the sequence when one of promises is rejected', (done) => {
+    const error = new Error();
+    const tasks = [sinon.stub().throws(error), sinon.stub().returns(2)];
+
+    promiseWaterfall(tasks).catch(err => {
+      expect(err).to.equal(error);
+      expect(tasks[1].callCount).to.equal(0);
+      done();
+    });
+  });
+
 });
