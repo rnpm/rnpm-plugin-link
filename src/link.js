@@ -43,13 +43,13 @@ const linkDependencyAndroid = (androidProject, dependency) => {
     return null;
   }
 
-  return pollParams(dependency.config.params).then(answers => {
+  return pollParams(dependency.config.params).then(params => {
     log.info(`Linking ${dependency.name} android dependency`);
 
     registerDependencyAndroid(
       dependency.name,
       dependency.config.android,
-      answers,
+      params,
       androidProject
     );
 
