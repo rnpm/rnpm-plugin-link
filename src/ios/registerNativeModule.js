@@ -37,10 +37,6 @@ module.exports = function registerNativeModuleIOS(dependencyConfig, projectConfi
     );
   }
 
-  if (hasLibraryImported(libraries, dependencyConfig.projectName)) {
-    return false;
-  }
-
   const file = addFileToProject(
     project,
     path.relative(projectConfig.sourceDir, dependencyConfig.projectPath)
@@ -68,6 +64,4 @@ module.exports = function registerNativeModuleIOS(dependencyConfig, projectConfi
     projectConfig.pbxprojPath,
     project.writeSync()
   );
-
-  return true;
 };

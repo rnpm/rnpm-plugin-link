@@ -28,23 +28,9 @@ module.exports = function registerNativeAndroidModule(name, androidConfig, param
     makeMainActivityPatch(androidConfig, params)
   );
 
-  /**
-   * Check if module has been installed already
-   */
-  const isInstalled = compose(
-    (content) => ~content.indexOf(`:${name}`),
-    readFile(projectConfig.buildGradlePath)
-  );
-
-  if (isInstalled(name)) {
-    return false;
-  }
-
   compose(
     performSettingsGradlePatch,
     performBuildGradlePatch,
     performMainActivityPatch
   )();
-
-  return true;
 };
