@@ -18,6 +18,6 @@ module.exports = function makeMainActivityPatch(androidConfig, params) {
 
     return content
       .replace(classPattern, `${androidConfig.packageImportPath}\n\n${classPattern}`) // makes the import patch
-      .replace(packagePattern, `${packagePattern}${packagePatch}`) // makes the patch to add the package instance;
+      .replace(packagePattern, `${packagePattern}${packagePatch}`); // makes the patch to add the package instance;
   };
 };
