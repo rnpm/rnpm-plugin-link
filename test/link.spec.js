@@ -97,6 +97,41 @@ describe('link', () => {
     });
   });
 
+  it('should not register modules when they are already installed', (done) => {
+    const registerNativeModule = sinon.stub();
+    const config = {
+      getProjectConfig: () => ({ ios: {}, android: {}, assets: [] }),
+      getDependencyConfig: sinon.stub().returns({ ios: {}, android: {}, assets: [], commands: {} }),
+    };
+
+    mock(
+      '../src/ios/isInstalled.js',
+      sinon.stub().returns(true)
+    );
+
+    mock(
+      '../src/android/isInstalled.js',
+      sinon.stub().returns(true)
+    );
+
+    mock(
+      '../src/ios/registerNativeModule.js',
+      registerNativeModule
+    );
+
+    mock(
+      '../src/android/registerNativeModule.js',
+      registerNativeModule
+    );
+
+    const link = require('../src/link');
+
+    link(config, ['react-native-blur']).then(() => {
+      expect(registerNativeModule.callCount).to.equal(0);
+      done();
+    });
+  });
+
   it('should run prelink and postlink commands at the appropriate times', (done) => {
     const registerNativeModule = sinon.stub();
     const prelink = sinon.stub().yieldsAsync();
