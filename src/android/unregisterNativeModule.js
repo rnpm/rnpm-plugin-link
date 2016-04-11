@@ -4,7 +4,6 @@ const path = require('path');
 const compose = require('lodash').flowRight;
 const getReactVersion = require('../getReactNativeVersion');
 const getPrefix = require('./getPrefix');
-const isInstalled = require('./isInstalled');
 
 const cut = (scope, pattern) =>
   scope.replace(pattern, '');
@@ -61,15 +60,9 @@ module.exports = function unregisterNativeAndroidModule(name, dependencyConfig, 
     readFile(projectConfig.mainActivityPath)
   );
 
-  if (!isInstalled(projectConfig, name)) {
-    return false;
-  }
-
   compose(
     applySettingsGradlePatch,
     applyBuildGradlePatch,
     applyMainActivityPatch
   )();
-
-  return true;
 };

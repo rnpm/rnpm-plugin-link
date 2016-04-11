@@ -6,7 +6,6 @@ const getProducts = require('./getProducts');
 const getHeadersInFolder = require('./getHeadersInFolder');
 const isEmpty = require('lodash').isEmpty;
 const getHeaderSearchPath = require('./getHeaderSearchPath');
-const hasLibraryImported = require('./hasLibraryImported');
 const removeProjectFromProject = require('./removeProjectFromProject');
 const removeProjectFromLibraries = require('./removeProjectFromLibraries');
 const removeFromStaticLibraries = require('./removeFromStaticLibraries');
@@ -22,11 +21,7 @@ const getGroup = require('./getGroup');
 module.exports = function unregisterNativeModule(dependencyConfig, projectConfig) {
   const project = xcode.project(projectConfig.pbxprojPath).parseSync();
   const dependencyProject = xcode.project(dependencyConfig.pbxprojPath).parseSync();
-
   const libraries = getGroup(project, projectConfig.libraryFolder);
-  if (!libraries || !hasLibraryImported(libraries, dependencyConfig.projectName)) {
-    return false;
-  }
 
   const file = removeProjectFromProject(
     project,
@@ -55,6 +50,4 @@ module.exports = function unregisterNativeModule(dependencyConfig, projectConfig
     projectConfig.pbxprojPath,
     project.writeSync()
   );
-
-  return true;
 };
