@@ -1,9 +1,8 @@
-const compose = require('lodash').flowRight;
-const readFile = require('./fs').readFile;
+const fs = require('fs');
+const makeBuildPatch = require(`./patches/makeBuildPatch`);
 
-module.exports = function isInstalled(projectConfig, name) {
-  return compose(
-    (content) => content.indexOf(`:${name}`) >= 0,
-    readFile(projectConfig.buildGradlePath)
-  )();
+module.exports = function isInstalled(config, name) {
+  return fs
+    .readFileSync(config.buildGradlePath)
+    .indexOf(makeBuildPatch(name).patch) > -1;
 };

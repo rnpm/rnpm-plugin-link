@@ -1,36 +1,41 @@
-const readFile = require('./fs').readFile;
-const writeFile = require('./fs').writeFile;
-const compose = require('lodash').flowRight;
+const fs = require('fs');
 const getReactVersion = require('../getReactNativeVersion');
 const getPrefix = require('./getPrefix');
+const isInstalled = require('./isInstalled');
 
-const applyPatch = (filePath, patch) =>
-  compose(writeFile(filePath), patch, readFile(filePath));
+const applyPatch = require('./patches/applyPatch');
+const makeSettingsPatch = require(`./patches/makeSettingsPatch`);
+const makeBuildPatch = require(`./patches/makeBuildPatch`);
 
-module.exports = function registerNativeAndroidModule(name, androidConfig, params, projectConfig) {
+module.exports = function registerNativeAndroidModule(
+  name,
+  androidConfig,
+  params,
+  projectConfig
+) {
+  const buildPatch = makeBuildPatch(name);
+  const isInstalled = fs
+    .readFileSync(projectConfig.buildGradlePath)
+    .indexOf(buildPatch.patch) > -1;
+
+  if (isInstalled(projectConfig, name)) {
+    return false;
+  }
+
   const prefix = getPrefix(getReactVersion(projectConfig.folder));
-  const makeSettingsPatch = require(`./patches/makeSettingsPatch`);
-  const makeBuildPatch = require(`./patches/makeBuildPatch`);
   const makeMainActivityPatch = require(`./${prefix}/makeMainActivityPatch`);
 
-  const performSettingsGradlePatch = applyPatch(
+  applyPatch(
     projectConfig.settingsGradlePath,
-    makeSettingsPatch.apply(null, arguments)
+    makeSettingsPatch(name, androidConfig, projectConfig)
   );
 
-  const performBuildGradlePatch = applyPatch(
-    projectConfig.buildGradlePath,
-    makeBuildPatch(name)
-  );
+  applyPatch(projectConfig.buildGradlePath, buildPatch);
 
-  const performMainActivityPatch = applyPatch(
+  applyPatch(
     projectConfig.mainActivityPath,
     makeMainActivityPatch(androidConfig, params)
   );
 
-  compose(
-    performSettingsGradlePatch,
-    performBuildGradlePatch,
-    performMainActivityPatch
-  )();
+  return true;
 };
