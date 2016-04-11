@@ -4,6 +4,7 @@ const getPrefix = require('./getPrefix');
 const isInstalled = require('./isInstalled');
 
 const applyPatch = require('./patches/applyPatch');
+const makeStringsPatch = require('./patches/makeStringsPatch');
 const makeSettingsPatch = require(`./patches/makeSettingsPatch`);
 const makeBuildPatch = require(`./patches/makeBuildPatch`);
 
@@ -13,17 +14,15 @@ module.exports = function registerNativeAndroidModule(
   params,
   projectConfig
 ) {
-  const buildPatch = makeBuildPatch(name);
-  const isInstalled = fs
-    .readFileSync(projectConfig.buildGradlePath)
-    .indexOf(buildPatch.patch) > -1;
 
   if (isInstalled(projectConfig, name)) {
     return false;
   }
 
+  const buildPatch = makeBuildPatch(name);
   const prefix = getPrefix(getReactVersion(projectConfig.folder));
-  const makeMainActivityPatch = require(`./${prefix}/makeMainActivityPatch`);
+  const makeImportPatch = require(`./${prefix}/makeImportPatch`);
+  const makePackagePatch = require(`./${prefix}/makePackagePatch`);
 
   applyPatch(
     projectConfig.settingsGradlePath,
@@ -31,10 +30,16 @@ module.exports = function registerNativeAndroidModule(
   );
 
   applyPatch(projectConfig.buildGradlePath, buildPatch);
+  applyPatch(projectConfig.stringsPath, makeStringsPatch(params));
 
   applyPatch(
     projectConfig.mainActivityPath,
-    makeMainActivityPatch(androidConfig, params)
+    makePackagePatch(androidConfig.packageInstance, params)
+  );
+
+  applyPatch(
+    projectConfig.mainActivityPath,
+    makeImportPatch(androidConfig.packageImportPath)
   );
 
   return true;
