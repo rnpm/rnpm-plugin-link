@@ -5,6 +5,7 @@ const flatten = require('lodash').flatten;
 const pkg = require('../package.json');
 
 const isEmpty = require('lodash').isEmpty;
+const promiseWaterfall = require('./promiseWaterfall');
 const registerDependencyAndroid = require('./android/registerNativeModule');
 const registerDependencyIOS = require('./ios/registerNativeModule');
 const isInstalledAndroid = require('./android/isInstalled');
@@ -23,13 +24,6 @@ const dedupeAssets = (assets) => uniq(assets, asset => path.basename(asset));
 const promisify = (func) => new Promise((resolve, reject) =>
   func((err, res) => err ? reject(err) : resolve(res))
 );
-
-function promiseWaterfall(tasks) {
-  return tasks.reduce(
-    (prevTaskPromise, task) => prevTaskPromise.then(task),
-    Promise.resolve()
-  );
-}
 
 const linkDependencyAndroid = (androidProject, dependency) => {
   if (!androidProject || !dependency.config.android) {
