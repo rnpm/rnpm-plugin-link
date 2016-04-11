@@ -3,7 +3,7 @@ const path = require('path');
 const chai = require('chai');
 const expect = chai.expect;
 const makeMainActivityPatch = require(
-  '../../../../src/android/patches/0.17/makeMainActivityPatch'
+  '../../../../src/android/patches/makeMainActivityPatch'
 );
 
 const config = {
