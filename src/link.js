@@ -38,9 +38,9 @@ const linkDependencyAndroid = (androidProject, dependency) => {
   }
   
   // Legacy support for top-level params that is Android-only
-  const params = dependency.config.params.concat(dependency.config.android.params);
+  const androidParams = dependency.config.params.concat(dependency.config.android.params);
 
-  return pollParams(params).then(params => {
+  return pollParams(androidParams).then(params => {
     log.info(`Linking ${dependency.name} android dependency`);
 
     registerDependencyAndroid(
