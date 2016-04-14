@@ -10,21 +10,19 @@ const projectConfig = {
 };
 
 describe('android::isInstalled', () => {
+  before(() => mock({
+    'build.gradle': fs.readFileSync(
+      path.join(__dirname, '../fixtures/android/patchedBuild.gradle')
+    ),
+  }));
 
-  before(() => {
-    mock({
-      'build.gradle': fs.readFileSync(path.join(__dirname, '../fixtures/android/patchedBuild.gradle')),
-    });
-  });
+  it('should return true when project is already in build.gradle', () =>
+    expect(isInstalled(projectConfig, 'test')).to.be.true
+  );
 
-  it('should return true when project is already in build.gradle', () => {
-    expect(isInstalled(projectConfig, 'test')).to.be.true;
-  });
-
-  it('should return false when project is not in build.gradle', () => {
-    expect(isInstalled(projectConfig, 'test2')).to.be.false;
-  });
+  it('should return false when project is not in build.gradle', () =>
+    expect(isInstalled(projectConfig, 'test2')).to.be.false
+  );
 
   after(mock.restore);
-
 });

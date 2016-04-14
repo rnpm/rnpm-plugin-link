@@ -8,6 +8,6 @@ module.exports = function makePackagePatch(packageInstance, params) {
 
   return {
     pattern: '.addPackage(new MainReactPackage())',
-    patch: `\n                .addPackage(${processedInstance})`
+    patch: `\n                .addPackage(${processedInstance})`,
   };
 };

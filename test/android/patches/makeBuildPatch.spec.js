@@ -1,5 +1,3 @@
-const fs = require('fs');
-const path = require('path');
 const chai = require('chai');
 const expect = chai.expect;
 const makeBuildPatch = require('../../../src/android/patches/makeBuildPatch');
