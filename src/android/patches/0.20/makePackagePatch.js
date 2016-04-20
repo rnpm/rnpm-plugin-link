@@ -1,10 +1,7 @@
+const applyParams = require('../applyParams');
+
 module.exports = function makePackagePatch(packageInstance, params) {
-  const processedInstance = packageInstance.replace(
-    /\$\{(\w+)\}/g,
-    (pattern, paramName) => params[paramName]
-      ? `this.getResources().getString(R.strings.${paramName})`
-      : null
-  );
+  const processedInstance = applyParams(packageInstance, params);
 
   return {
     pattern: 'new MainReactPackage()',
