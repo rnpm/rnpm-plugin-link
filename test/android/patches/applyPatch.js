@@ -5,7 +5,13 @@ const applyParams = require('../../../src/android/patches/applyParams');
 describe('applyParams', () => {
   it('apply params to the string', () => {
     expect(
-      applyParams('${foo}', {foo: 'foo'})
-    ).to.be.equal('this.getResources().getString(R.strings.foo)');
+      applyParams('${foo}', {foo: 'foo'}, 'react-native')
+    ).to.be.equal('this.getResources().getString(R.strings.reactNativeFoo)');
+  });
+
+  it('use null if no params provided', () => {
+    expect(
+      applyParams('${foo}', {}, 'react-native')
+    ).to.be.equal('null');
   });
 });

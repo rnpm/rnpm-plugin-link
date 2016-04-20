@@ -34,7 +34,7 @@ module.exports = function registerNativeAndroidModule(
 
   applyPatch(
     projectConfig.mainActivityPath,
-    makePackagePatch(androidConfig.packageInstance, params)
+    makePackagePatch(androidConfig.packageInstance, params, name)
   );
 
   applyPatch(

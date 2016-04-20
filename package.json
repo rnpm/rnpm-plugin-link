@@ -37,6 +37,7 @@
     "npmlog": "^2.0.0",
     "plist": "^1.2.0",
     "semver": "^5.1.0",
+    "to-camel-case": "^1.0.0",
     "xcode": "^0.8.2"
   },
   "devDependencies": {
