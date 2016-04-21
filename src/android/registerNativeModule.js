@@ -24,7 +24,7 @@ module.exports = function registerNativeAndroidModule(
   );
 
   applyPatch(projectConfig.buildGradlePath, buildPatch);
-  applyPatch(projectConfig.stringsPath, makeStringsPatch(params));
+  applyPatch(projectConfig.stringsPath, makeStringsPatch(params, name));
 
   applyPatch(
     projectConfig.mainActivityPath,

@@ -1,6 +1,9 @@
-module.exports = function makeStringsPatch(params) {
-  const patch = Object.keys(params).map(key =>
-    `    <string moduleConfig="true" name="${key}">${params[key]}</string>`
+const toCamelCase = require('to-camel-case');
+
+module.exports = function makeStringsPatch(params, prefix) {
+  const patch = Object.keys(params).map(param => '    ' +
+    '<string moduleConfig="true" ' +
+      `name="${toCamelCase(`${prefix}-${param}`)}">${params[param]}</string>`
   ).join('\n') + '\n';
 
   return {
