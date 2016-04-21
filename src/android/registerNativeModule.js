@@ -1,7 +1,6 @@
 const fs = require('fs');
 const getReactVersion = require('../getReactNativeVersion');
 const getPrefix = require('./getPrefix');
-const isInstalled = require('./isInstalled');
 
 const applyPatch = require('./patches/applyPatch');
 const makeStringsPatch = require('./patches/makeStringsPatch');
@@ -14,11 +13,6 @@ module.exports = function registerNativeAndroidModule(
   params,
   projectConfig
 ) {
-
-  if (isInstalled(projectConfig, name)) {
-    return false;
-  }
-
   const buildPatch = makeBuildPatch(name);
   const prefix = getPrefix(getReactVersion(projectConfig.folder));
   const makeImportPatch = require(`./${prefix}/makeImportPatch`);
