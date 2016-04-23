@@ -1,7 +1,7 @@
 const fs = require('fs');
 const getReactVersion = require('../getReactNativeVersion');
 const getPrefix = require('./getPrefix');
-const isInstalled = require('./isInstalled');
+const toCamelCase = require('to-camel-case');
 
 const revokePatch = require('./patches/revokePatch');
 const makeSettingsPatch = require('./patches/makeSettingsPatch');
@@ -13,11 +13,6 @@ module.exports = function unregisterNativeAndroidModule(
   androidConfig,
   projectConfig
 ) {
-
-  if (!isInstalled(projectConfig, name)) {
-    return false;
-  }
-
   const buildPatch = makeBuildPatch(name);
   const prefix = getPrefix(getReactVersion(projectConfig.folder));
   const makeImportPatch = require(`./${prefix}/makeImportPatch`);
@@ -27,7 +22,9 @@ module.exports = function unregisterNativeAndroidModule(
 
   strings.replace(
     /moduleConfig="true" name="(\w+)">(\w+)</g,
-    (_, name, value) => params[name] = value
+    (_, param, value) => {
+      params[param.slice(toCamelCase(name).length + 1)] = value;
+    }
   );
 
   revokePatch(
@@ -36,11 +33,12 @@ module.exports = function unregisterNativeAndroidModule(
   );
 
   revokePatch(projectConfig.buildGradlePath, buildPatch);
-  revokePatch(projectConfig.stringsPath, makeStringsPatch(params));
+  revokePatch(projectConfig.stringsPath, makeStringsPatch(params, name));
+
 
   revokePatch(
     projectConfig.mainActivityPath,
-    makePackagePatch(androidConfig.packageInstance, params)
+    makePackagePatch(androidConfig.packageInstance, params, name)
   );
 
   revokePatch(
