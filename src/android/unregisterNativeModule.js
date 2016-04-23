@@ -35,7 +35,6 @@ module.exports = function unregisterNativeAndroidModule(
   revokePatch(projectConfig.buildGradlePath, buildPatch);
   revokePatch(projectConfig.stringsPath, makeStringsPatch(params, name));
 
-
   revokePatch(
     projectConfig.mainActivityPath,
     makePackagePatch(androidConfig.packageInstance, params, name)

@@ -11,6 +11,7 @@ const projectConfig = {
 };
 
 const packageInstance = 'new SomeLibrary(${foo}, ${bar}, \'something\')';
+const name = 'some-library';
 const params = {
   foo: 'foo',
   bar: 'bar',
@@ -24,7 +25,7 @@ describe('makePackagePatch@0.20', () => {
   }));
 
   it('MainActivity contains a correct 0.20 package patch', () => {
-    const packagePatch = makePackagePatch(packageInstance, params);
+    const packagePatch = makePackagePatch(packageInstance, params, name);
 
     applyPatch('MainActivity.java', packagePatch);
     expect(fs.readFileSync('MainActivity.java', 'utf8'))
