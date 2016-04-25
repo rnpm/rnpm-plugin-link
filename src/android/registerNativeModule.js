@@ -1,7 +1,9 @@
+const log = require('npmlog');
+const compose = require('lodash').flowRight;
 const readFile = require('./fs').readFile;
 const writeFile = require('./fs').writeFile;
-const compose = require('lodash').flowRight;
 const getReactVersion = require('../getReactNativeVersion');
+const pkg = require('../../package.json');
 const getPrefix = require('./getPrefix');
 
 const applyPatch = (filePath, patch) =>
@@ -9,9 +11,15 @@ const applyPatch = (filePath, patch) =>
 
 module.exports = function registerNativeAndroidModule(name, androidConfig, params, projectConfig) {
   const prefix = getPrefix(getReactVersion(projectConfig.folder));
-  const makeSettingsPatch = require(`./patches/makeSettingsPatch`);
-  const makeBuildPatch = require(`./patches/makeBuildPatch`);
-  const makeMainActivityPatch = require(`./${prefix}/makeMainActivityPatch`);
+
+  try {
+    const makeSettingsPatch = require(`./patches/makeSettingsPatch`);
+    const makeBuildPatch = require(`./patches/makeBuildPatch`);
+    const makeMainActivityPatch = require(`./${prefix}/makeMainActivityPatch`);
+  } catch (e) {
+    log.error(e + '.\nIt seems something went wrong while patching ' +
+      'Android modules.\nPlease file an issue here: ' + pkg.bugs.url);
+  }
 
   const performSettingsGradlePatch = applyPatch(
     projectConfig.settingsGradlePath,
