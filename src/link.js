@@ -94,8 +94,9 @@ const linkAssets = (project, assets) => {
  * If optional argument [packageName] is provided, it's the only one that's checked
  */
 module.exports = function link(config, args) {
+  var project;
   try {
-    const project = config.getProjectConfig();
+    project = config.getProjectConfig();
   } catch (err) {
     log.error('ERRPACKAGEJSON', `No package found. Are you sure it's a React Native project?`);
     return Promise.reject(err);
