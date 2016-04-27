@@ -9,25 +9,28 @@ const projectConfig = {
   sourceDir: '/home/project/android/app',
   settingsGradlePath: '/home/project/android/settings.gradle',
 };
-const dependencyConfig = { sourceDir: `/home/project/node_modules/${name}/android` };
-const settingsGradle = fs.readFileSync(
-  path.join(process.cwd(), 'test/fixtures/android/settings.gradle'),
-  'utf-8'
-);
-const patchedSettingsGradle = fs.readFileSync(
-  path.join(process.cwd(), 'test/fixtures/android/patchedSettings.gradle'),
-  'utf-8'
-);
+const dependencyConfig = {
+  sourceDir: `/home/project/node_modules/${name}/android`,
+};
 
 describe('makeSettingsPatch', () => {
   it('should build a patch function', () => {
     expect(
       makeSettingsPatch(name, dependencyConfig, {}, projectConfig)
-    ).to.be.a('function');
+    ).to.be.an('object');
   });
 
   it('should make a correct patch', () => {
-    const patch = makeSettingsPatch(name, dependencyConfig, {}, projectConfig);
-    expect(patch(settingsGradle)).to.be.equal(patchedSettingsGradle);
+    const projectDir = path.relative(
+      path.dirname(projectConfig.settingsGradlePath),
+      dependencyConfig.sourceDir
+    );
+
+    expect(makeSettingsPatch(name, dependencyConfig, projectConfig).patch)
+      .to.be.equal(
+        `include ':${name}'\n` +
+        `project(':${name}').projectDir = ` +
+        `new File(rootProject.projectDir, '${projectDir}')`
+      );
   });
 });

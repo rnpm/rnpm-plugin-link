@@ -1,36 +1,40 @@
-const readFile = require('./fs').readFile;
-const writeFile = require('./fs').writeFile;
-const compose = require('lodash').flowRight;
+const fs = require('fs');
 const getReactVersion = require('../getReactNativeVersion');
 const getPrefix = require('./getPrefix');
 
-const applyPatch = (filePath, patch) =>
-  compose(writeFile(filePath), patch, readFile(filePath));
+const applyPatch = require('./patches/applyPatch');
+const makeStringsPatch = require('./patches/makeStringsPatch');
+const makeSettingsPatch = require(`./patches/makeSettingsPatch`);
+const makeBuildPatch = require(`./patches/makeBuildPatch`);
 
-module.exports = function registerNativeAndroidModule(name, androidConfig, params, projectConfig) {
+module.exports = function registerNativeAndroidModule(
+  name,
+  androidConfig,
+  params,
+  projectConfig
+) {
+  const buildPatch = makeBuildPatch(name);
   const prefix = getPrefix(getReactVersion(projectConfig.folder));
-  const makeSettingsPatch = require(`./patches/makeSettingsPatch`);
-  const makeBuildPatch = require(`./patches/makeBuildPatch`);
-  const makeMainActivityPatch = require(`./${prefix}/makeMainActivityPatch`);
+  const makeImportPatch = require(`./${prefix}/makeImportPatch`);
+  const makePackagePatch = require(`./${prefix}/makePackagePatch`);
 
-  const performSettingsGradlePatch = applyPatch(
+  applyPatch(
     projectConfig.settingsGradlePath,
-    makeSettingsPatch.apply(null, arguments)
+    makeSettingsPatch(name, androidConfig, projectConfig)
   );
 
-  const performBuildGradlePatch = applyPatch(
-    projectConfig.buildGradlePath,
-    makeBuildPatch(name)
-  );
+  applyPatch(projectConfig.buildGradlePath, buildPatch);
+  applyPatch(projectConfig.stringsPath, makeStringsPatch(params, name));
 
-  const performMainActivityPatch = applyPatch(
+  applyPatch(
     projectConfig.mainActivityPath,
-    makeMainActivityPatch(androidConfig, params)
+    makePackagePatch(androidConfig.packageInstance, params, name)
   );
 
-  compose(
-    performSettingsGradlePatch,
-    performBuildGradlePatch,
-    performMainActivityPatch
-  )();
+  applyPatch(
+    projectConfig.mainActivityPath,
+    makeImportPatch(androidConfig.packageImportPath)
+  );
+
+  return true;
 };

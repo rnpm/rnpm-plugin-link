@@ -19,7 +19,6 @@ log.heading = 'rnpm-link';
  * If optional argument [packageName] is provided, it's the only one that's checked
  */
 module.exports = function unlink(config, args) {
-
   try {
     const project = config.getProjectConfig();
   } catch (err) {
