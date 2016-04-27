@@ -21,7 +21,7 @@ module.exports = function unregisterNativeAndroidModule(
   var params = {};
 
   strings.replace(
-    /moduleConfig="true" name="(\w+)">(\w+)</g,
+    /moduleConfig="true" name="(\w+)">(.*)</g,
     (_, param, value) => {
       params[param.slice(toCamelCase(name).length + 1)] = value;
     }
