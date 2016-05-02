@@ -98,7 +98,10 @@ module.exports = function link(config, args) {
   try {
     project = config.getProjectConfig();
   } catch (err) {
-    log.error('ERRPACKAGEJSON', `No package found. Are you sure it's a React Native project?`);
+    log.error(
+      'ERRPACKAGEJSON',
+      'No package found. Are you sure it\'s a React Native project?'
+    );
     return Promise.reject(err);
   }
 
