@@ -50,7 +50,7 @@
 /**
  * Possible errors
  */
-    "max-len": [2, 90],
+    "max-len": [1, 90],
     "comma-dangle": [2, "always-multiline"],    // http://eslint.org/docs/rules/comma-dangle
     "no-cond-assign": [2, "always"],  // http://eslint.org/docs/rules/no-cond-assign
     "no-console": 0,                 // http://eslint.org/docs/rules/no-console
