@@ -30,7 +30,7 @@ describe('makeSettingsPatch', () => {
       .to.be.equal(
         `include ':${name}'\n` +
         `project(':${name}').projectDir = ` +
-        `new File(rootProject.projectDir, '${projectDir}')`
+        `new File(rootProject.projectDir, '${projectDir}')\n`
       );
   });
 });
