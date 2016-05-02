@@ -44,6 +44,4 @@ module.exports = function unregisterNativeAndroidModule(
     projectConfig.mainActivityPath,
     makeImportPatch(androidConfig.packageImportPath)
   );
-
-  return true;
 };
