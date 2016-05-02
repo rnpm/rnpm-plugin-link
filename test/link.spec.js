@@ -64,9 +64,10 @@ describe('link', () => {
 
   it('should register native module when android/ios projects are present', (done) => {
     const registerNativeModule = sinon.stub();
+    const dependencyConfig = {android: {}, ios: {}, assets: [], commands: {}};
     const config = {
-      getProjectConfig: () => ({ android: {}, ios: {}, assets: [] }),
-      getDependencyConfig: sinon.stub().returns({ android: {}, ios: {}, assets: [], commands: {} }),
+      getProjectConfig: () => ({android: {}, ios: {}, assets: []}),
+      getDependencyConfig: sinon.stub().returns(dependencyConfig),
     };
 
     mock(
@@ -99,9 +100,10 @@ describe('link', () => {
 
   it('should not register modules when they are already installed', (done) => {
     const registerNativeModule = sinon.stub();
+    const dependencyConfig = {ios: {}, android: {}, assets: [], commands: {}};
     const config = {
       getProjectConfig: () => ({ ios: {}, android: {}, assets: [] }),
-      getDependencyConfig: sinon.stub().returns({ ios: {}, android: {}, assets: [], commands: {} }),
+      getDependencyConfig: sinon.stub().returns(dependencyConfig),
     };
 
     mock(
@@ -165,6 +167,7 @@ describe('link', () => {
 
   it('should copy assets from both project and dependencies projects', (done) => {
     const dependencyAssets = ['Fonts/Font.ttf'];
+    const dependencyConfig = {assets: dependencyAssets, commands: {}};
     const projectAssets = ['Fonts/FontC.ttf'];
     const copyAssets = sinon.stub();
 
@@ -175,7 +178,7 @@ describe('link', () => {
 
     const config = {
       getProjectConfig: () => ({ ios: {}, assets: projectAssets }),
-      getDependencyConfig: sinon.stub().returns({ assets: dependencyAssets, commands: {} }),
+      getDependencyConfig: sinon.stub().returns(dependencyConfig),
     };
 
     const link = require('../src/link');
