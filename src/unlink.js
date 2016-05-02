@@ -48,7 +48,7 @@ const unlinkDependencyIOS = (iOSProject, dependency, packageName) => {
 
   log.info(`Unlinking ${packageName} ios dependency`);
 
-  unregisterDependencyIOS(dependency.ios, project.ios);
+  unregisterDependencyIOS(dependency.ios, iOSProject);
 
   log.info(`iOS module ${packageName} has been successfully unlinked`);
 };
@@ -81,7 +81,7 @@ module.exports = function unlink(config, args) {
     return Promise.reject(err);
   }
 
-  unlinkDependencyAndroid(project.ios, dependency, packageName);
+  unlinkDependencyAndroid(project.android, dependency, packageName);
   unlinkDependencyIOS(project.ios, dependency, packageName);
 
   const allDependencies = getDependencyConfig(config, getProjectDependencies());
