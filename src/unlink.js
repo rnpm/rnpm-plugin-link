@@ -23,7 +23,7 @@ const unlinkDependencyAndroid = (androidProject, dependency, packageName) => {
   const isInstalled = isInstalledAndroid(androidProject, packageName);
 
   if (!isInstalled) {
-    log.info(`Android module ${packageName} is already unlinked`);
+    log.info(`Android module ${packageName} is not installed`);
     return;
   }
 
@@ -42,7 +42,7 @@ const unlinkDependencyIOS = (iOSProject, dependency, packageName) => {
   const isInstalled = isInstalledIOS(iOSProject, dependency.ios);
 
   if (!isInstalled) {
-    log.info(`iOS module ${packageName} is already unlinked`);
+    log.info(`iOS module ${packageName} is not installed`);
     return;
   }
 
