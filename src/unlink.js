@@ -56,7 +56,8 @@ const unlinkDependencyIOS = (iOSProject, dependency, packageName) => {
 /**
  * Updates project and unlink specific dependency
  *
- * If optional argument [packageName] is provided, it's the only one that's checked
+ * If optional argument [packageName] is provided, it's the only one
+ * that's checked
  */
 module.exports = function unlink(config, args) {
   const packageName = args[0];
@@ -77,7 +78,10 @@ module.exports = function unlink(config, args) {
   try {
     dependency = config.getDependencyConfig(packageName);
   } catch (err) {
-    log.warn('ERRINVALIDPROJ', `Project ${packageName} is not a react-native library`);
+    log.warn(
+      'ERRINVALIDPROJ',
+      `Project ${packageName} is not a react-native library`
+    );
     return Promise.reject(err);
   }
 
@@ -105,7 +109,9 @@ module.exports = function unlink(config, args) {
     unlinkAssetsAndroid(assets, project.android.assetsPath);
   }
 
-  log.info(`${packageName} assets has been successfully unlinked from your project`);
+  log.info(
+    `${packageName} assets has been successfully unlinked from your project`
+  );
 
   return Promise.resolve();
 };
