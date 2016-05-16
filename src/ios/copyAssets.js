@@ -14,7 +14,6 @@ const getPlistPath = require('./getPlistPath');
  */
 module.exports = function linkAssetsIOS(files, projectConfig) {
   const project = xcode.project(projectConfig.pbxprojPath).parseSync();
-  const assets = groupFilesByType(files);
   const plist = getPlist(project, projectConfig.sourceDir);
 
   if (!plist) {
@@ -33,7 +32,7 @@ module.exports = function linkAssetsIOS(files, projectConfig) {
     );
   }
 
-  const fonts = (assets.font || [])
+  const assets = (files || [])
     .map(asset =>
       project.addResourceFile(
         path.relative(projectConfig.sourceDir, asset),
@@ -43,7 +42,9 @@ module.exports = function linkAssetsIOS(files, projectConfig) {
     .filter(file => file)   // xcode returns false if file is already there
     .map(file => file.basename);
 
-  plist.UIAppFonts = (plist.UIAppFonts || []).concat(fonts);
+  const groupedAssets = groupFilesByType(files);
+
+  plist.UIAppFonts = (plist.UIAppFonts || []).concat(groupedAssets.fonts || []);
 
   fs.writeFileSync(
     projectConfig.pbxprojPath,
