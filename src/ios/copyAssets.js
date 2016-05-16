@@ -32,7 +32,7 @@ module.exports = function linkAssetsIOS(files, projectConfig) {
     );
   }
 
-  const assets = (files || [])
+  const assets = files
     .map(asset =>
       project.addResourceFile(
         path.relative(projectConfig.sourceDir, asset),
@@ -44,7 +44,7 @@ module.exports = function linkAssetsIOS(files, projectConfig) {
 
   const assetsByType = groupFilesByType(assets);
 
-  plist.UIAppFonts = (plist.UIAppFonts || []).concat(assetsByType.fonts || []);
+  plist.UIAppFonts = (plist.UIAppFonts || []).concat(assetsByType.font || []);
 
   fs.writeFileSync(
     projectConfig.pbxprojPath,
