@@ -42,9 +42,9 @@ module.exports = function linkAssetsIOS(files, projectConfig) {
     .filter(file => file)   // xcode returns false if file is already there
     .map(file => file.basename);
 
-  const groupedAssets = groupFilesByType(files);
+  const assetsByType = groupFilesByType(assets);
 
-  plist.UIAppFonts = (plist.UIAppFonts || []).concat(groupedAssets.fonts || []);
+  plist.UIAppFonts = (plist.UIAppFonts || []).concat(assetsByType.fonts || []);
 
   fs.writeFileSync(
     projectConfig.pbxprojPath,
