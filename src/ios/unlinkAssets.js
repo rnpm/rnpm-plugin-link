@@ -14,7 +14,6 @@ const difference = require('lodash').difference;
  */
 module.exports = function unlinkAssetsIOS(files, projectConfig) {
   const project = xcode.project(projectConfig.pbxprojPath).parseSync();
-  const assets = groupFilesByType(files);
   const plist = getPlist(project, projectConfig.sourceDir);
 
   if (!plist) {
@@ -31,7 +30,7 @@ module.exports = function unlinkAssetsIOS(files, projectConfig) {
     );
   }
 
-  const fonts = (assets.font || [])
+  const assets = files
     .map(asset =>
       project.removeResourceFile(
         path.relative(projectConfig.sourceDir, asset),
@@ -40,7 +39,9 @@ module.exports = function unlinkAssetsIOS(files, projectConfig) {
     )
     .map(file => file.basename);
 
-  plist.UIAppFonts = difference(plist.UIAppFonts || [], fonts);
+  const assetsByType = groupFilesByType(assets);
+
+  plist.UIAppFonts = difference(plist.UIAppFonts || [], assetsByType.font);
 
   fs.writeFileSync(
     projectConfig.pbxprojPath,
