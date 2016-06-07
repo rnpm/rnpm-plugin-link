@@ -89,7 +89,7 @@ module.exports = function unlink(config, args) {
   unlinkDependencyIOS(project.ios, dependency, packageName);
 
   const allDependencies = getDependencyConfig(config, getProjectDependencies());
-  const otherDependencies = filter(allDependencies, ({name}) => name !== packageName);
+  const otherDependencies = filter(allDependencies, d => d.name !== packageName);
 
   const assets = difference(
     dependency.assets,
