@@ -88,8 +88,8 @@ module.exports = function unlink(config, args) {
   }
 
   const allDependencies = getDependencyConfig(config, getProjectDependencies());
-  const otherDependencies = filter(allDependencies, ({name}) => name !== packageName);
-  const iOSDependencies = compact(otherDependencies.map(({config}) => config.ios));
+  const otherDependencies = filter(allDependencies, d => d.name !== packageName);
+  const iOSDependencies = compact(otherDependencies.map(d => d.config.ios));
 
   unlinkDependencyAndroid(project.android, dependency, packageName);
   unlinkDependencyIOS(project.ios, dependency, packageName, iOSDependencies);
