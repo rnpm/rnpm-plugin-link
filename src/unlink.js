@@ -10,8 +10,8 @@ const unlinkAssetsAndroid = require('./android/unlinkAssets');
 const unlinkAssetsIOS = require('./ios/unlinkAssets');
 const getDependencyConfig = require('./getDependencyConfig');
 const difference = require('lodash').difference;
+const filter = require('lodash').filter;
 const isEmpty = require('lodash').isEmpty;
-const flatten = require('lodash').flatten;
 
 log.heading = 'rnpm-link';
 
@@ -89,10 +89,14 @@ module.exports = function unlink(config, args) {
   unlinkDependencyIOS(project.ios, dependency, packageName);
 
   const allDependencies = getDependencyConfig(config, getProjectDependencies());
+  const otherDependencies = filter(allDependencies, d => d.name !== packageName);
 
   const assets = difference(
     dependency.assets,
-    flatten(allDependencies, d => d.assets)
+    otherDependencies.reduce(
+      (assets, dependency) => assets.concat(dependency.config.assets),
+      project.assets
+    )
   );
 
   if (isEmpty(assets)) {
