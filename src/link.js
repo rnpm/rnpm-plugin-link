@@ -25,8 +25,8 @@ const promisify = (func) => new Promise((resolve, reject) =>
   func((err, res) => err ? reject(err) : resolve(res))
 );
 
-const linkDependencyAndroid = (androidProject, dependency) => {
-  if (!androidProject || !dependency.config.android) {
+const linkDependencyAndroid = (androidProject, dependency, options) => {
+  if (!androidProject || !dependency.config.android || options.skip == 'android') {
     return null;
   }
 
@@ -51,8 +51,8 @@ const linkDependencyAndroid = (androidProject, dependency) => {
   });
 };
 
-const linkDependencyIOS = (iOSProject, dependency) => {
-  if (!iOSProject || !dependency.config.ios) {
+const linkDependencyIOS = (iOSProject, dependency, options) => {
+  if (!iOSProject || !dependency.config.ios || options.skip == 'ios') {
     return;
   }
 
@@ -70,17 +70,17 @@ const linkDependencyIOS = (iOSProject, dependency) => {
   log.info(`iOS module ${dependency.name} has been successfully linked`);
 };
 
-const linkAssets = (project, assets) => {
+const linkAssets = (project, assets, options) => {
   if (isEmpty(assets)) {
     return;
   }
 
-  if (project.ios) {
+  if (project.ios && options.skip != 'ios') {
     log.info('Linking assets to ios project');
     copyAssetsIOS(assets, project.ios);
   }
 
-  if (project.android) {
+  if (project.android && options.skip != 'android') {
     log.info('Linking assets to android project');
     copyAssetsAndroid(assets, project.android.assetsPath);
   }
@@ -93,7 +93,7 @@ const linkAssets = (project, assets) => {
  *
  * If optional argument [packageName] is provided, it's the only one that's checked
  */
-module.exports = function link(config, args) {
+module.exports = function link(config, args, options) {
   var project;
   try {
     project = config.getProjectConfig();
@@ -119,12 +119,12 @@ module.exports = function link(config, args) {
 
   const tasks = flatten(dependencies.map(dependency => [
     () => promisify(dependency.config.commands.prelink || commandStub),
-    () => linkDependencyAndroid(project.android, dependency),
-    () => linkDependencyIOS(project.ios, dependency),
+    () => linkDependencyAndroid(project.android, dependency, options),
+    () => linkDependencyIOS(project.ios, dependency, options),
     () => promisify(dependency.config.commands.postlink || commandStub),
   ]));
 
-  tasks.push(() => linkAssets(project, assets));
+  tasks.push(() => linkAssets(project, assets, options));
 
   return promiseWaterfall(tasks).catch(err => {
     log.error(
