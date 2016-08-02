@@ -26,7 +26,7 @@ const promisify = (func) => new Promise((resolve, reject) =>
 );
 
 const linkDependencyAndroid = (androidProject, dependency, options) => {
-  if (!androidProject || !dependency.config.android || options.skip == 'android') {
+  if (!androidProject || !dependency.config.android || options.skip === 'android') {
     return null;
   }
 
@@ -52,7 +52,7 @@ const linkDependencyAndroid = (androidProject, dependency, options) => {
 };
 
 const linkDependencyIOS = (iOSProject, dependency, options) => {
-  if (!iOSProject || !dependency.config.ios || options.skip == 'ios') {
+  if (!iOSProject || !dependency.config.ios || options.skip === 'ios') {
     return;
   }
 
@@ -75,12 +75,12 @@ const linkAssets = (project, assets, options) => {
     return;
   }
 
-  if (project.ios && options.skip != 'ios') {
+  if (project.ios && options.skip !== 'ios') {
     log.info('Linking assets to ios project');
     copyAssetsIOS(assets, project.ios);
   }
 
-  if (project.android && options.skip != 'android') {
+  if (project.android && options.skip !== 'android') {
     log.info('Linking assets to android project');
     copyAssetsAndroid(assets, project.android.assetsPath);
   }

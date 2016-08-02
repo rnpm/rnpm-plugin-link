@@ -5,7 +5,7 @@ module.exports = [{
   options: [{
     flags: '-s, --skip [platform]',
     description: 'Skip linking for platform (android or ios)',
-    default: '',
+    default: ''
   }]
 }, {
   func: require('./src/unlink'),
