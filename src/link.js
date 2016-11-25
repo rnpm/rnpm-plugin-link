@@ -36,8 +36,11 @@ const linkDependencyAndroid = (androidProject, dependency) => {
     log.info(`Android module ${dependency.name} is already linked`);
     return null;
   }
+  
+  // Legacy support for top-level params that is Android-only
+  const androidParams = dependency.config.params.concat(dependency.config.android.params);
 
-  return pollParams(dependency.config.params).then(params => {
+  return pollParams(androidParams).then(params => {
     log.info(`Linking ${dependency.name} android dependency`);
 
     registerDependencyAndroid(
